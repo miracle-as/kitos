@@ -245,7 +245,7 @@
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />
     <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
-    <Compile Include="Controllers\API\OrganizationRightsController.cs" />
+    <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\DataRowController.cs" />
     <Compile Include="Controllers\API\ItContractRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectRightController.cs" />

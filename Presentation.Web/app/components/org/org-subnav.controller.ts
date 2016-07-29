@@ -73,7 +73,7 @@
                                         role: Kitos.API.Models.OrganizationRole.User,
                                     };
 
-                                    $http.post("api/OrganizationRights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
+                                    $http.post("api/OrganizationRight/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
                                         msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {
