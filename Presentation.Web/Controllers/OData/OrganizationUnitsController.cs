@@ -2,7 +2,6 @@
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainServices;
 using System.Web.Http.Results;
 using System.Net;

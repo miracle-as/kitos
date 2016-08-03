@@ -44,9 +44,12 @@ namespace Presentation.Web
 
             var accessMod = builder.AddEnumType(typeof(AccessModifier));
             accessMod.Namespace = "Kitos";
+            var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
+            orgRoles.Namespace = "Kitos";
 
-            //builder.EntitySet<OrganizationRight>("OrganizationRights");
-            //builder.EntitySet<OrganizationRole>("OrganizationRoles");
+            var organizationRights = builder.EntitySet<OrganizationRight>("OrganizationRights");
+            organizationRights.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Advice>("Advices");
             //builder.EntitySet<AgreementElementType>("AgreementElementTypes");
             //builder.EntitySet<BusinessType>("BusinessTypes");
@@ -133,10 +136,8 @@ namespace Presentation.Web
 
             var users = builder.EntitySet<User>("Users");
             users.EntityType.HasKey(x => x.Id);
-            users.EntityType.Ignore(x => x.Email);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
-            users.EntityType.Ignore(x => x.PhoneNumber);
 
             var usages = builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             usages.EntityType.HasKey(x => x.Id);

@@ -262,6 +262,7 @@
     <Compile Include="Controllers\OData\ItContractRolesController.cs" />
     <Compile Include="Controllers\OData\ItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
     <Compile Include="Controllers\OData\ItContractsController.cs" />
