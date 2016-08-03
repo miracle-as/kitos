@@ -43,4 +43,20 @@
     export interface IKendoGridExcelExportEvent<TDataSource> extends kendo.ui.GridExcelExportEvent {
         sender: IKendoGrid<TDataSource>;
     }
+
+    export interface IRequestShortcutConfigWithCustomConfig extends ng.IRequestShortcutConfig {
+        [key: string]: any;
+    }
+
+    export interface IHttpServiceWithCustomConfig extends ng.IHttpService {
+        post<T>(url: string, data: any, config?: IRequestShortcutConfigWithCustomConfig): ng.IHttpPromise<T>;
+    }
+
+    export interface IRequestConfigWithCustomConfig extends ng.IRequestConfig, IRequestShortcutConfigWithCustomConfig {
+
+    }
+
+    export interface IHttpInterceptorWithCustomConfig extends ng.IHttpInterceptor {
+        request?: (config: IRequestConfigWithCustomConfig) => IRequestConfigWithCustomConfig | ng.IPromise<IRequestConfigWithCustomConfig>;
+    }
 }

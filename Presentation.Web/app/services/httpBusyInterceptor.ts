@@ -1,5 +1,5 @@
-﻿(function (ng, app) {
-    app.factory("httpBusyInterceptor", ['$q', '$rootScope', function ($q, $rootScope) {
+﻿((ng, app) => {
+    app.factory("httpBusyInterceptor", ["$q", "$rootScope", ($q: ng.IQService, $rootScope: ng.IRootScopeService) => {
         var isBusy = false;
 
         function makeBusy() {
@@ -18,13 +18,13 @@
             }
         }
 
-        return {
-            'request': function (config) {
-                var qConfig = $q.when(config);
+        var service: Kitos.IHttpInterceptorWithCustomConfig = {
+            request(config) {
+                const qConfig = $q.when(config);
 
-                return qConfig.then(function(cfg) {
-                    if (cfg.method !== 'GET') {
-                        if (cfg.handleBusy) {
+                return qConfig.then((cfg) => {
+                    if (cfg.method !== "GET") {
+                        if (cfg["handleBusy"]) {
                             if (isBusy) {
                                 return $q.reject("BUSY");
                             } else {
@@ -32,24 +32,20 @@
                             }
                         }
                     }
-
                     return cfg;
                 });
-
-
             },
-
-            'response': function (response) {
+            response(response) {
                 clearBusy();
 
                 return response || $q.when(response);
             },
-
-            'responseError': function (rejection) {
+            responseError(rejection) {
                 clearBusy();
 
                 return $q.reject(rejection);
             }
         };
+        return service;
     }]);
 })(angular, app);

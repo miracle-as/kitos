@@ -9,7 +9,7 @@
         public mainGrid: IKendoGrid<IUserOverview>;
         //public mainGridOptions: kendo.ui.GridOptions;
 
-        public static $inject: string[] = ['$scope', '$http', '$timeout', '_', '$state', '$uibModal', '$q', '$stateParams', 'notify', 'user'];
+        public static $inject: string[] = ["$scope", "$http", "$timeout", "_", "$state", "$uibModal", "$q", "$stateParams", "notify", "user"];
 
         constructor(
             private $scope: ng.IScope,
@@ -25,7 +25,7 @@
         }
 
         private fixNameFilter(filterUrl, column) {
-            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `$1concat(concat(User/Name, ' '), User/LastName)$2`);
         }
 
@@ -34,22 +34,27 @@
                 type: "odata-v4",
                 transport: {
                     read: {
-                        url: (options) => {
-                            var urlParameters = `?$expand=User,ObjectOwner`;
-                            return `/odata/Organizations(${this.user.currentOrganizationId})/Rights` + urlParameters;
+                        url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
+                        dataType: "json"
+                    },
+                    destroy: {
+                        url: (entity) => {
+                            return `/odata/Organizations(${this.user.currentOrganizationId})/Rights(${entity.Id})`;
                         },
                         dataType: "json"
                     },
-                    parameterMap: (options, type) => {
-                        // get kendo to map parameters to an odata url
-                        var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+                    parameterMap: (options, operation) => {
+                        if (operation === "read") {
+                            // get kendo to map parameters to an odata url
+                            const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
 
-                        if (parameterMap.$filter) {
-                            parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "User.Name");
-                            parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
+                            if (parameterMap.$filter) {
+                                parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "User.Name");
+                                parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
+                            }
+
+                            return parameterMap;
                         }
-
-                        return parameterMap;
                     }
                 },
                 sort: {
@@ -62,17 +67,10 @@
                 serverFiltering: true,
                 schema: {
                     model: {
-                        id: "Id",
-                        fields: {
-                            //"User.Name": { type: "string" },
-                            //"User.LastName": { type: "string" },
-                            //"ObjectOwner.Name": { type: "string" },
-                            //"ObjectOwner.LastName": { type: "string" },
-                            Role: { type: "string" }
-                        }
-                    },
+                        id: "Id"
+                    }
                     //parse: response => {
-                    //    // iterrate each contract
+                    //    // iterate each contract
                     //    this._.forEach(response.value, contract => {
                     //        // HACK to add economy data to result
                     //        var ecoData = <Array<any>>this._.where(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
@@ -100,7 +98,7 @@
 
                     //        // HACK to flattens the Rights on usage so they can be displayed as single columns
                     //        contract.roles = [];
-                    //        // iterrate each right
+                    //        // iterate each right
                     //        this._.forEach(contract.Rights, right => {
                     //            // init an role array to hold users assigned to this role
                     //            if (!contract.roles[right.RoleId])
@@ -113,7 +111,7 @@
                     //    return response;
                     //}
                 }
-            },
+            } as kendo.data.DataSourceOptions,
             toolbar: [
                 { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                 {
@@ -209,11 +207,16 @@
                     }
                 },
                 {
-                    command: <kendo.ui.GridColumnCommandItem[]>["edit", "destroy"], title: " ", width: "150px",
+                    command: [{ text: "Redigér", click: this.editRight }, "destroy"] as kendo.ui.GridColumnCommandItem[], title: " ", width: "150px",
                     persistId: "foo"
                 }
             ]
         };
+
+        private editRight(e) {
+            e.preventDefault();
+            console.log("rediger");
+        }
 
         private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
@@ -234,7 +237,7 @@
             } else {
                 this.exportFlag = false;
 
-                // hide coloumns on visual grid
+                // hide columns on visual grid
                 this._.forEach(columns, column => {
                     if (column.tempVisual) {
                         delete column.tempVisual;
@@ -243,39 +246,38 @@
                 });
 
                 // render templates
-                var sheet = e.workbook.sheets[0];
+                const sheet = e.workbook.sheets[0];
 
                 // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
+                for (let rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    const row = sheet.rows[rowIndex];
 
                     // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
+                    const dataItem = e.data[rowIndex - 1];
 
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                    for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                         if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
+                        const cell = row.cells[columnIndex];
+                        const template = this.getTemplateMethod(columns[columnIndex]);
 
                         cell.value = template(dataItem);
                     }
                 }
 
-                // hide loadingbar when export is finished
+                // hide loading bar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
             }
         }
 
         private getTemplateMethod(column) {
-            var template: Function;
+            let template: Function;
 
             if (column.excelTemplate) {
                 template = column.excelTemplate;
             } else if (typeof column.template === "function") {
-                template = <Function>column.template;
+                template = (column.template as Function);
             } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
+                template = kendo.template(column.template as string);
             } else {
                 template = t => t;
             }

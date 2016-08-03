@@ -592,6 +592,7 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
+    <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\models\api\organization-role.ts" />
@@ -668,6 +669,8 @@
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
+    <TypeScriptCompile Include="app\models\organization-right.ts" />
+    <TypeScriptCompile Include="app\models\organization-role.ts" />
     <TypeScriptCompile Include="app\models\organization-type.ts" />
     <TypeScriptCompile Include="app\models\organization-unit.ts" />
     <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
@@ -833,7 +836,7 @@
     <Content Include="app\shared\limitToDots.filter.js" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
-    <Content Include="app\services\httpServices.js" />
+    <TypeScriptCompile Include="app\services\httpBusyInterceptor.ts" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
     <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
     <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
