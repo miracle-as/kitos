@@ -1,27 +1,209 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IUserOverview extends Models.IOrganizationRight {
-        User: Models.IUser;
+    interface IUserOverview extends Models.IOrganizationRight, Models.IEntity {
+
     }
 
     export class OrganizationUserController {
         public mainGrid: IKendoGrid<IUserOverview>;
-        //public mainGridOptions: kendo.ui.GridOptions;
+        public mainGridOptions: IKendoGridOptions<IUserOverview>;
 
-        public static $inject: string[] = ["$scope", "$http", "$timeout", "_", "$state", "$uibModal", "$q", "$stateParams", "notify", "user"];
+        public static $inject: string[] = ["$scope", "$http", "$timeout", "_", "$", "$state", "$uibModal", "$q", "$stateParams", "notify", "user"];
 
         constructor(
             private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
+            private $: JQueryStatic,
             private $state: ng.ui.IStateService,
             private $uibModal: ng.ui.bootstrap.IModalService,
             private $q: ng.IQService,
             private $stateParams: ng.ui.IStateParamsService,
             private notify,
             private user) {
+            this.mainGridOptions = {
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
+                            //url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
+                            dataType: "json"
+                        },
+                        destroy: {
+                            url: (entity) => {
+                                return `/odata/Organizations(${this.user.currentOrganizationId})/Rights(${entity.Id})`;
+                            },
+                            dataType: "json"
+                        },
+                        parameterMap: (options, operation) => {
+                            if (operation === "read") {
+                                // get kendo to map parameters to an odata url
+                                const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
+
+                                if (parameterMap.$filter) {
+                                    parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "User.Name");
+                                    parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
+                                }
+
+                                return parameterMap;
+                            }
+                        }
+                    },
+                    sort: {
+                        field: "User.Name",
+                        dir: "asc"
+                    },
+                    pageSize: 100,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    schema: {
+                        model: {
+                            id: "Id"
+                        }
+                        //parse: response => {
+                        //    // iterate each contract
+                        //    this._.forEach(response.value, contract => {
+                        //        // HACK to add economy data to result
+                        //        var ecoData = <Array<any>>this._.where(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
+                        //        contract.Acquisition = this._.sum(ecoData, "Acquisition");
+                        //        contract.Operation = this._.sum(ecoData, "Operation");
+                        //        contract.Other = this._.sum(ecoData, "Other");
+
+                        //        var earliestAuditDate = this._.first(this._.sortByOrder(ecoData, ["AuditDate"], ["desc"]));
+                        //        if (earliestAuditDate && earliestAuditDate.AuditDate) {
+                        //            contract.AuditDate = earliestAuditDate.AuditDate;
+                        //        }
+
+                        //        var totalWhiteStatuses = this._.where(ecoData, { AuditStatus: "White" }).length;
+                        //        var totalRedStatuses = this._.where(ecoData, { AuditStatus: "Red" }).length;
+                        //        var totalYellowStatuses = this._.where(ecoData, { AuditStatus: "Yellow" }).length;
+                        //        var totalGreenStatuses = this._.where(ecoData, { AuditStatus: "Green" }).length;
+
+                        //        contract.status = {
+                        //            max: totalWhiteStatuses + totalRedStatuses + totalYellowStatuses + totalGreenStatuses,
+                        //            white: totalWhiteStatuses,
+                        //            red: totalRedStatuses,
+                        //            yellow: totalYellowStatuses,
+                        //            green: totalGreenStatuses
+                        //        };
+
+                        //        // HACK to flattens the Rights on usage so they can be displayed as single columns
+                        //        contract.roles = [];
+                        //        // iterate each right
+                        //        this._.forEach(contract.Rights, right => {
+                        //            // init an role array to hold users assigned to this role
+                        //            if (!contract.roles[right.RoleId])
+                        //                contract.roles[right.RoleId] = [];
+
+                        //            // push username to the role array
+                        //            contract.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
+                        //        });
+                        //    });
+                        //    return response;
+                        //}
+                    }
+                } as kendo.data.DataSourceOptions,
+                toolbar: [
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                ],
+                excel: {
+                    fileName: "Brugere.xlsx",
+                    filterable: true,
+                    allPages: true
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
+                },
+                sortable: {
+                    mode: "single"
+                },
+                editable: "popup",
+                reorderable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                groupable: false,
+                columnMenu: {
+                    filterable: false
+                },
+                //dataBound: this.saveGridOptions,
+                //columnResize: this.saveGridOptions,
+                //columnHide: this.saveGridOptions,
+                //columnShow: this.saveGridOptions,
+                //columnReorder: this.saveGridOptions,
+                excelExport: this.exportToExcel,
+                columns: [
+                    {
+                        field: "User.Name", title: "Navn", width: 150,
+                        persistId: "fullname", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
+                        excelTemplate: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "User.Email", title: "Email", width: 150,
+                        persistId: "email", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.User.Email,
+                        excelTemplate: (dataItem) => dataItem.User.Email,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                        persistId: "createdby", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
+                        excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Role", title: "Rolle", width: 150,
+                        persistId: "role", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "might-overflow" },
+                        //template: (dataItem) => this._.pluck(dataItem.OrganizationRights, "Role").join(", "),
+                        template: (dataItem) => dataItem.Role.toString(),
+                        //excelTemplate: (dataItem) => this._.pluck(dataItem.OrganizationRights, "Role").join(", "),
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        command: [{ text: "Redigér", click: this.editRight, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any, "destroy"], title: " ", width: "150px",
+                        persistId: "foo"
+                    }
+                ]
+            };
         }
 
         private fixNameFilter(filterUrl, column) {
@@ -29,193 +211,10 @@
             return filterUrl.replace(pattern, `$1concat(concat(User/Name, ' '), User/LastName)$2`);
         }
 
-        public mainGridOptions: IKendoGridOptions<IUserOverview> = {
-            dataSource: {
-                type: "odata-v4",
-                transport: {
-                    read: {
-                        url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
-                        dataType: "json"
-                    },
-                    destroy: {
-                        url: (entity) => {
-                            return `/odata/Organizations(${this.user.currentOrganizationId})/Rights(${entity.Id})`;
-                        },
-                        dataType: "json"
-                    },
-                    parameterMap: (options, operation) => {
-                        if (operation === "read") {
-                            // get kendo to map parameters to an odata url
-                            const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
-
-                            if (parameterMap.$filter) {
-                                parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "User.Name");
-                                parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
-                            }
-
-                            return parameterMap;
-                        }
-                    }
-                },
-                sort: {
-                    field: "User.Name",
-                    dir: "asc"
-                },
-                pageSize: 100,
-                serverPaging: true,
-                serverSorting: true,
-                serverFiltering: true,
-                schema: {
-                    model: {
-                        id: "Id"
-                    }
-                    //parse: response => {
-                    //    // iterate each contract
-                    //    this._.forEach(response.value, contract => {
-                    //        // HACK to add economy data to result
-                    //        var ecoData = <Array<any>>this._.where(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
-                    //        contract.Acquisition = this._.sum(ecoData, "Acquisition");
-                    //        contract.Operation = this._.sum(ecoData, "Operation");
-                    //        contract.Other = this._.sum(ecoData, "Other");
-
-                    //        var earliestAuditDate = this._.first(this._.sortByOrder(ecoData, ["AuditDate"], ["desc"]));
-                    //        if (earliestAuditDate && earliestAuditDate.AuditDate) {
-                    //            contract.AuditDate = earliestAuditDate.AuditDate;
-                    //        }
-
-                    //        var totalWhiteStatuses = this._.where(ecoData, { AuditStatus: "White" }).length;
-                    //        var totalRedStatuses = this._.where(ecoData, { AuditStatus: "Red" }).length;
-                    //        var totalYellowStatuses = this._.where(ecoData, { AuditStatus: "Yellow" }).length;
-                    //        var totalGreenStatuses = this._.where(ecoData, { AuditStatus: "Green" }).length;
-
-                    //        contract.status = {
-                    //            max: totalWhiteStatuses + totalRedStatuses + totalYellowStatuses + totalGreenStatuses,
-                    //            white: totalWhiteStatuses,
-                    //            red: totalRedStatuses,
-                    //            yellow: totalYellowStatuses,
-                    //            green: totalGreenStatuses
-                    //        };
-
-                    //        // HACK to flattens the Rights on usage so they can be displayed as single columns
-                    //        contract.roles = [];
-                    //        // iterate each right
-                    //        this._.forEach(contract.Rights, right => {
-                    //            // init an role array to hold users assigned to this role
-                    //            if (!contract.roles[right.RoleId])
-                    //                contract.roles[right.RoleId] = [];
-
-                    //            // push username to the role array
-                    //            contract.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
-                    //        });
-                    //    });
-                    //    return response;
-                    //}
-                }
-            } as kendo.data.DataSourceOptions,
-            toolbar: [
-                { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
-                {
-                    name: "clearFilter",
-                    text: "Nulstil",
-                    template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
-                }
-            ],
-            excel: {
-                fileName: "Brugere.xlsx",
-                filterable: true,
-                allPages: true
-            },
-            pageable: {
-                refresh: true,
-                pageSizes: [10, 25, 50, 100, 200],
-                buttonCount: 5
-            },
-            sortable: {
-                mode: "single"
-            },
-            editable: "popup",
-            reorderable: true,
-            resizable: true,
-            filterable: {
-                mode: "row"
-            },
-            groupable: false,
-            columnMenu: {
-                filterable: false
-            },
-            //dataBound: this.saveGridOptions,
-            //columnResize: this.saveGridOptions,
-            //columnHide: this.saveGridOptions,
-            //columnShow: this.saveGridOptions,
-            //columnReorder: this.saveGridOptions,
-            excelExport: this.exportToExcel,
-            columns: [
-                {
-                    field: "User.Name", title: "Navn", width: 150,
-                    persistId: "fullname", // DON'T YOU DARE RENAME!
-                    template: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
-                    excelTemplate: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
-                    hidden: false,
-                    filterable: {
-                        cell: {
-                            dataSource: [],
-                            showOperators: false,
-                            operator: "contains"
-                        }
-                    }
-                },
-                {
-                    field: "User.Email", title: "Email", width: 150,
-                    persistId: "email", // DON'T YOU DARE RENAME!
-                    template: (dataItem) => dataItem.User.Email,
-                    excelTemplate: (dataItem) => dataItem.User.Email,
-                    hidden: false,
-                    filterable: {
-                        cell: {
-                            dataSource: [],
-                            showOperators: false,
-                            operator: "contains"
-                        }
-                    }
-                },
-                {
-                    field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
-                    persistId: "createdby", // DON'T YOU DARE RENAME!
-                    template: (dataItem) => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
-                    excelTemplate: (dataItem) => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
-                    hidden: false,
-                    filterable: {
-                        cell: {
-                            dataSource: [],
-                            showOperators: false,
-                            operator: "contains"
-                        }
-                    }
-                },
-                {
-                    field: "Role", title: "Rolle", width: 150,
-                    persistId: "role", // DON'T YOU DARE RENAME!
-                    template: (dataItem) => dataItem.Role.toString(),
-                    excelTemplate: (dataItem) => dataItem.Role.toString(),
-                    hidden: false,
-                    filterable: {
-                        cell: {
-                            dataSource: [],
-                            showOperators: false,
-                            operator: "contains"
-                        }
-                    }
-                },
-                {
-                    command: [{ text: "Redigér", click: this.editRight }, "destroy"] as kendo.ui.GridColumnCommandItem[], title: " ", width: "150px",
-                    persistId: "foo"
-                }
-            ]
-        };
-
-        private editRight(e) {
-            e.preventDefault();
-            console.log("rediger");
+        private editRight = (e) => {
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = dataItem["Id"];
+            this.$state.go("organization.user.edit", { id: entityId, userObj: dataItem });
         }
 
         private exportFlag = false;
@@ -555,7 +554,7 @@
         .module("app")
         .config(["$stateProvider", ($stateProvider) => {
             $stateProvider.state("organization.user", {
-                url: "/user:lastModule",
+                url: "/user",
                 templateUrl: "app/components/org/user/org-user.view.html",
                 controller: OrganizationUserController,
                 controllerAs: "ctrl",

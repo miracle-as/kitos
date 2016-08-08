@@ -813,7 +813,7 @@
                 }
             }
         };
-        
+
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";
 

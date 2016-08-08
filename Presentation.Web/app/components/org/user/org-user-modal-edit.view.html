@@ -8,15 +8,7 @@
                 Email-adresse
             </label>
             <div class="col-md-8">
-                <input type="email" name="email" data-ng-model="email" class="form-control" data-ng-required="true" data-ng-disabled="busy" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="repeatEmail" class="col-md-3 control-label">
-                Gentag email-adresse
-            </label>
-            <div class="col-md-8">
-                <input type="email" name="repeatEmail" data-ng-model="repeatEmail" class="form-control" data-match="email" data-ng-required="true" data-ng-disabled="busy"/>
+                <input type="email" name="email" id="email" data-ng-model="ctrl.email" class="form-control" data-ng-required="true" data-ng-disabled="busy">
             </div>
         </div>
         <div class="form-group">
@@ -24,7 +16,7 @@
                 Navn
             </label>
             <div class="col-md-8">
-                <input type="text" name="name" data-ng-model="name" class="form-control" data-ng-required="true" data-ng-disabled="busy" autofocus/>
+                <input type="text" name="name" id="name" data-ng-model="ctrl.name" class="form-control" data-ng-required="true" data-disabled-on-busy>
             </div>
         </div>
         <div class="form-group">
@@ -32,7 +24,7 @@
                 Efternavn
             </label>
             <div class="col-md-8">
-                <input type="text" name="lastName" data-ng-model="lastName" class="form-control" data-ng-required="true" data-ng-disabled="busy" />
+                <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.lastName" class="form-control" data-ng-required="true" data-disabled-on-busy>
             </div>
         </div>
         <div class="form-group">
@@ -40,17 +32,12 @@
                 Telefon
             </label>
             <div class="col-md-8">
-                <input type="text" name="phoneNumber" data-ng-model="phoneNumber" class="form-control" data-ng-required="false" data-ng-disabled="busy" />
+                <input type="text" name="phoneNumber" id="phoneNumber" data-ng-model="ctrl.phoneNumber" class="form-control" data-ng-required="false" data-disabled-on-busy>
             </div>
-        </div>
-        <div class="form-group">
-            <p class="help-block col-md-offset-3">
-                Vedkommendes oplysninger vil blive opdateret i systemet.
-            </p>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="editUser.form.$invalid || editUser.form.$pristine || busy" data-disabled-on-busy="">Gem ændringer</button>
-    <button class="btn btn-warning" data-ng-click="cancel()" data-ng-disabled="busy" data-disabled-on-busy="">Annuller</button>
+    <button class="btn btn-primary" data-ng-click="ctrl.ok()" data-ng-disabled="editUser.form.$invalid || editUser.form.$pristine" data-disabled-on-busy>Gem ændringer</button>
+    <button class="btn btn-warning" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
 </div>

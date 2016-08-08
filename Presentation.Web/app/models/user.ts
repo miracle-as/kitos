@@ -4,8 +4,6 @@
         LastName: string;
         PhoneNumber: string;
         Email: string;
-        Password: string;
-        Salt: string;
         IsGlobalAdmin: boolean;
         Uuid: any;
         LastAdvisDate: Date;

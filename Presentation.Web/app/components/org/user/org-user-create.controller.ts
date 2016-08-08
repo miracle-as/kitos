@@ -27,7 +27,7 @@
 
         public cancel() {
             this.$uibModalInstance.close();
-        };
+        }
 
         public create(sendMail) {
             this.busy = true;
@@ -66,7 +66,7 @@
                 msg.toErrorMessage(`Fejl! Noget gik galt ved oprettelsen af ${newUser.name}!`);
                 this.$uibModalInstance.close();
             });
-        };
+        }
     }
 
     angular
@@ -76,8 +76,8 @@
                 url: "/create",
                 onEnter: [
                     "$state", "$stateParams", "$uibModal",
-                    ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: ng.ui.bootstrap.IModalService) => {
-                        $modal.open({
+                    ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService) => {
+                        $uibModal.open({
                             templateUrl: "app/components/org/user/org-user-modal-create.view.html",
                             // fade in instead of slide from top, fixes strange cursor placement in IE
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
