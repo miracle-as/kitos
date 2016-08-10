@@ -22,5 +22,13 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == projId);
             return Ok(result);
         }
+
+        //[EnableQuery]
+        [ODataRoute("ItProjectRights/Default.Test(orgKey={orgKey})")]
+        public IHttpActionResult GetTest(int orgKey)
+        {
+            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgKey);
+            return Ok(result);
+        }
     }
 }

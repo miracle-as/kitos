@@ -8,8 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Microsoft.OData.Edm;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using Presentation.Web.Controllers.OData;
 
 namespace Presentation.Web
 {
@@ -84,77 +83,80 @@ namespace Presentation.Web
             //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
 
-            var itContractRoles = builder.EntitySet<ItContractRole>("ItContractRoles");
+            var itContractRoles = builder.EntitySet<ItContractRole>(nameof(ItContractRolesController).Replace("Controller", string.Empty));
             itContractRoles.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<ItProjectStatus>("ItProjectStatuses");
 
-            var itProjectRights = builder.EntitySet<ItProjectRight>("ItProjectRights");
+            var itProjectRights = builder.EntitySet<ItProjectRight>(nameof(ItProjectRightsController).Replace("Controller", string.Empty));
             itProjectRights.EntityType.HasKey(x => x.Id);
+            var itProjectRightsFunc = itProjectRights.EntityType.Collection.Function("Test")
+                .ReturnsCollection<ItProjectRight>();
+            itProjectRightsFunc.Parameter<int>("orgKey");
 
-            var itProjectRoles = builder.EntitySet<ItProjectRole>("ItProjectRoles");
+            var itProjectRoles = builder.EntitySet<ItProjectRole>(nameof(ItProjectRolesController).Replace("Controller", string.Empty));
             itProjectRoles.EntityType.HasKey(x => x.Id);
 
-            var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages");
+            var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
             itProjectOrgUnitUsage.EntityType.HasKey(x => new {x.ItProjectId, x.OrganizationUnitId});
 
-            var itProject = builder.EntitySet<ItProject>("ItProjects");
+            var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace("Controller", string.Empty));
             itProject.EntityType.HasKey(x => x.Id);
 
-            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages");
+            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
             interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
-            var dataOption = builder.EntitySet<DataType>("DataTypes");
+            var dataOption = builder.EntitySet<DataType>("DataTypes"); // no controller yet
             dataOption.EntityType.HasKey(x => x.Id);
 
-            var dataRow = builder.EntitySet<DataRow>("DataRows");
+            var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
             dataRow.EntityType.HasKey(x => x.Id);
 
-            var archiveOption = builder.EntitySet<ArchiveType>("ArchiveTypes");
+            var archiveOption = builder.EntitySet<ArchiveType>("ArchiveTypes"); // no controller yet
             archiveOption.EntityType.HasKey(x => x.Id);
 
-            var itSystems = builder.EntitySet<ItSystem>("ItSystems");
+            var itSystems = builder.EntitySet<ItSystem>(nameof(ItSystemsController).Replace("Controller", string.Empty));
             itSystems.EntityType.HasKey(x => x.Id);
 
-            var itSystemTypeOptions = builder.EntitySet<ItSystemType>("ItSystemTypes");
+            var itSystemTypeOptions = builder.EntitySet<ItSystemType>("ItSystemTypes"); // no controller yet
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
 
-            var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes");
+            var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes"); // no controller yet
             businessTypes.EntityType.HasKey(x => x.Id);
 
-            var taskRefs = builder.EntitySet<TaskRef>("TaskRefs");
+            var taskRefs = builder.EntitySet<TaskRef>("TaskRefs"); // no controller yet
             taskRefs.EntityType.HasKey(x => x.Id);
 
-            var organizations = builder.EntitySet<Organization>("Organizations");
+            var organizations = builder.EntitySet<Organization>(nameof(OrganizationsController).Replace("Controller", string.Empty));
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
 
-            var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
+            var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
             orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
 
-            var users = builder.EntitySet<User>("Users");
+            var users = builder.EntitySet<User>(nameof(UsersController).Replace("Controller", string.Empty));
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
 
-            var usages = builder.EntitySet<ItSystemUsage>("ItSystemUsages");
+            var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
             usages.EntityType.HasKey(x => x.Id);
 
-            var itSystemRights = builder.EntitySet<ItSystemRight>("ItSystemRights");
+            var itSystemRights = builder.EntitySet<ItSystemRight>(nameof(ItSystemRightsController).Replace("Controller", string.Empty));
             itSystemRights.EntityType.HasKey(x => x.Id);
 
-            var roles = builder.EntitySet<ItSystemRole>("ItSystemRoles");
+            var roles = builder.EntitySet<ItSystemRole>(nameof(ItSystemRolesController).Replace("Controller", string.Empty));
             roles.EntityType.HasKey(x => x.Id);
 
-            var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
+            var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages"); // no controller yet
             systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
 
-            var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages");
+            var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
 
-            var contracts = builder.EntitySet<ItContract>("ItContracts");
+            var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
             contracts.EntityType.HasKey(x => x.Id);
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
             contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
@@ -164,35 +166,35 @@ namespace Presentation.Web
             // if ItContract.Terminated has a value
             contracts.EntityType.Ignore(x => x.IsActive);
 
-            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceTypes");
+            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceTypes"); // no controller yet
             interfaceTypes.EntityType.HasKey(x => x.Id);
 
-            var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
+            var itInterfaces = builder.EntitySet<ItInterface>(nameof(ItInterfacesController).Replace("Controller", string.Empty));
             itInterfaces.EntityType.HasKey(x => x.Id);
 
-            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>("ItInterfaceTypes");
+            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>("ItInterfaceTypes"); // no controller yet
             itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
-            var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
+            var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
 
-            var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages");
+            var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages"); // no controller yet
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
 
-            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>("ItInterfaceUses");
+            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>(nameof(ItInterfaceUsesController).Replace("Controller", string.Empty));
             itInterfaceUse.EntityType
                 .HasKey(x => x.ItSystemId)
                 .HasKey(x => x.ItInterfaceId);
 
-            var tsas = builder.EntitySet<TsaType>("TsaTypes");
+            var tsas = builder.EntitySet<TsaType>("TsaTypes"); // no controller yet
             tsas.EntityType.HasKey(x => x.Id);
 
-            var methods = builder.EntitySet<MethodType>("MethodTypes");
+            var methods = builder.EntitySet<MethodType>("MethodTypes"); // no controller yet
             methods.EntityType.HasKey(x => x.Id);
 
-            var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes");
+            var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes"); // no controller yet
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<Optionend>("OptionExtendTypes");
@@ -204,7 +206,7 @@ namespace Presentation.Web
             //builder.EntitySet<PaymentModelType>("PaymentModelTypes");
             //builder.EntitySet<PriceRegulationType>("PriceRegulationTypes");
             //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
-            builder.EntitySet<ItProjectType>("ItProjectTypes");
+            builder.EntitySet<ItProjectType>("ItProjectTypes"); // no controller yet
             //builder.EntitySet<PurchaseFormType>("PurchaseFormTypes");
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");

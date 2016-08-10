@@ -133,6 +133,12 @@
                 columnMenu: {
                     filterable: false
                 },
+                detailTemplate: (dataItem) => `<uib-tabset active="0">
+                    <uib-tab index="0" heading="Static title">Static content</uib-tab>
+                    <uib-tab index="1" heading="Foo">Foo</uib-tab>
+                    <uib-tab index="2" heading="Projekt roller"><user-project-roles name="${dataItem.Id}"></user-project-roles></uib-tab>
+                </uib-tabset>`,
+                detailInit: this.detailEvent,
                 //dataBound: this.saveGridOptions,
                 //columnResize: this.saveGridOptions,
                 //columnHide: this.saveGridOptions,
@@ -282,6 +288,10 @@
             }
 
             return template;
+        }
+
+        private detailEvent = (e: kendo.ui.GridDetailInitEvent) => {
+            console.log("detail event");
         }
 
         //private isLocalAdmin(selectedUser) {
