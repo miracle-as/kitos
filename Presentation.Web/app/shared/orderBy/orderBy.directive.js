@@ -1,8 +1,7 @@
-﻿(function(ng, app) {
+(function (ng, app) {
     'use strict';
-
     app.directive('orderBy', [
-        function() {
+        function () {
             return {
                 scope: {
                     orderBy: '=orderBy',
@@ -10,21 +9,20 @@
                 },
                 replace: true,
                 templateUrl: 'app/shared/orderBy/orderBy.view.html',
-                link: function(scope, element, attrs) {
-                    scope.order = function() {
+                link: function (scope, element, attrs) {
+                    scope.order = function () {
                         scope.pagination.skip = 0;
-
                         if (scope.pagination.orderBy == scope.orderBy) {
                             scope.pagination.descending = !scope.pagination.descending;
-                        } else {
+                        }
+                        else {
                             scope.pagination.orderBy = scope.orderBy;
                             scope.pagination.descending = false;
                         }
                     };
                 }
-
             };
-
         }
     ]);
 })(angular, app);
+//# sourceMappingURL=orderBy.directive.js.map

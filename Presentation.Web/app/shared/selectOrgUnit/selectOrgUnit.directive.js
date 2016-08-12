@@ -1,9 +1,8 @@
-﻿(function(ng, app) {
+(function (ng, app) {
     'use strict';
-
     app.directive('selectOrgUnit', [
         '$http', '$timeout', '$sce', 'userService',
-        function($http, $timeout, $sce, userService) {
+        function ($http, $timeout, $sce, userService) {
             return {
                 scope: {
                     extraOptions: '=?',
@@ -14,57 +13,51 @@
                 require: 'ngModel',
                 priority: 0,
                 templateUrl: 'app/shared/selectOrgUnit/selectOrgUnit.view.html',
-                link: function(scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
-                    element.bind('change', function() {
-                        $timeout(function() {
+                    element.bind('change', function () {
+                        $timeout(function () {
                             //update the view value
                             if (scope.select.selected === "") {
                                 ctrl.$setViewValue(null);
-                            } else {
+                            }
+                            else {
                                 ctrl.$setViewValue(scope.select.selected);
                             }
-
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
                     });
-
                     //when the outer ngModel is changed, update the inner model
-                    ctrl.$render = function() {
+                    ctrl.$render = function () {
                         scope.select.selected = ctrl.$viewValue;
                     };
-
                     //stores the <options> for the select
                     var options = [];
-
                     //settings for select2
                     var settings = {
                         allowClear: !!scope.allowClear,
-
                         //don't format markup in result
-                        escapeMarkup: function(m) { return m; },
-
+                        escapeMarkup: function (m) { return m; },
                         //when an option has been selected, print the no-html version
-                        formatSelection: function(item) {
-
+                        formatSelection: function (item) {
                             var option;
                             if (item.id) {
                                 option = _.findWhere(options, { id: parseInt(item.id) });
-                            } else {
+                            }
+                            else {
                                 option = _.findWhere(options, { id: parseInt(item) });
                             }
-
                             if (option) {
                                 return option.selectedText;
-                            } else {
+                            }
+                            else {
                                 return null;
                             }
                         }
                     };
-
                     if (scope.extraOptions) {
-                        _.each(scope.extraOptions, function(extraOption) {
+                        _.each(scope.extraOptions, function (extraOption) {
                             var option = {
                                 id: extraOption.id,
                                 text: extraOption.text,
@@ -73,11 +66,9 @@
                             options.push(option);
                         });
                     }
-
                     //loads the org unit roots
-                    userService.getUser().then(function(user) {
-                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId).success(function(result) {
-
+                    userService.getUser().then(function (user) {
+                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId).success(function (result) {
                             //recursive function for added indentation,
                             //and pushing org units to the list in the right order (depth-first)
                             function visit(orgUnit, indentation) {
@@ -86,22 +77,16 @@
                                     text: $sce.trustAsHtml(indentation + orgUnit.name),
                                     selectedText: orgUnit.name
                                 };
-
                                 options.push(option);
-
-                                _.each(orgUnit.children, function(child) {
+                                _.each(orgUnit.children, function (child) {
                                     //indentation is non breaking spaces (alt+255)
                                     return visit(child, indentation + "    ");
                                 });
                             }
-
                             visit(result.response, "");
-
                             scope.select.isReady = true;
                         });
-
                     });
-
                     scope.select = {
                         settings: settings,
                         options: options,
@@ -113,3 +98,4 @@
         }
     ]);
 })(angular, app);
+//# sourceMappingURL=selectOrgUnit.directive.js.map

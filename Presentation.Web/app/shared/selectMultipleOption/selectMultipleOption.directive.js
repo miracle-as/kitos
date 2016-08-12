@@ -1,6 +1,5 @@
-﻿(function (ng, app) {
+(function (ng, app) {
     'use strict';
-
     app.directive("selectMultipleOption", [
         function () {
             return {
@@ -24,10 +23,10 @@
                             deletedOptions.push({ id: value, name: scope.selectedTexts()[key] });
                         }
                     });
-
                     scope.deletedOptions = deletedOptions;
                 }
             };
         }
     ]);
 })(angular, app);
+//# sourceMappingURL=selectMultipleOption.directive.js.map
