@@ -35,6 +35,7 @@ namespace Presentation.Web
 
             config.EnableEnumPrefixFree(true);
             config.EnableCaseInsensitive(true);
+            config.EnableUnqualifiedNameCall(true);
         }
 
         public static IEdmModel GetModel()
@@ -80,8 +81,10 @@ namespace Presentation.Web
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             //builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibtUsages");
             //builder.EntitySet<InterfaceType>("InterfaceTypes");
-            //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
+
+            var itContractRights = builder.EntitySet<ItContractRight>(nameof(ItContractRightsController).Replace("Controller", string.Empty));
+            itContractRights.EntityType.HasKey(x => x.Id);
 
             var itContractRoles = builder.EntitySet<ItContractRole>(nameof(ItContractRolesController).Replace("Controller", string.Empty));
             itContractRoles.EntityType.HasKey(x => x.Id);
@@ -140,6 +143,7 @@ namespace Presentation.Web
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
+            users.EntityType.Action("Remove").Parameter<int>("OrganizationId");
 
             var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
             usages.EntityType.HasKey(x => x.Id);
@@ -198,8 +202,13 @@ namespace Presentation.Web
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<Optionend>("OptionExtendTypes");
-            //builder.EntitySet<OrganizationUnitRight>("OrganizationUnitRights");
-            //builder.EntitySet<OrganizationUnitRole>("OrganizationUnitRoles");
+
+            var organizationUnitRights = builder.EntitySet<OrganizationUnitRight>(nameof(OrganizationUnitRightsController).Replace("Controller", string.Empty));
+            organizationUnitRights.EntityType.HasKey(x => x.Id);
+
+            var organiationUnitRoles = builder.EntitySet<OrganizationUnitRole>(nameof(OrganizationUnitRolesController).Replace("Controller", string.Empty));
+            organiationUnitRoles.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
             //builder.EntitySet<PaymentFreqencyType>("PaymentFreqencyTypes");
             //builder.EntitySet<PaymentMilestone>("PaymentMilestones");

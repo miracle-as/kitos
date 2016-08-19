@@ -33,7 +33,7 @@ namespace Core.ApplicationServices
         public bool IsLocalAdmin(int userId, int organizationId)
         {
             var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId &&
+                .SingleOrDefault(x => x.Id == userId &&
                     x.OrganizationRights.Any(
                         right => right.Role == OrganizationRole.LocalAdmin &&
                         right.OrganizationId == organizationId));
@@ -49,7 +49,7 @@ namespace Core.ApplicationServices
         public bool IsLocalAdmin(int userId)
         {
             var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId &&
+                .SingleOrDefault(x => x.Id == userId &&
                     x.OrganizationRights.Any(
                         right => right.Role == OrganizationRole.LocalAdmin &&
                         right.OrganizationId == x.DefaultOrganizationId));
@@ -91,7 +91,7 @@ namespace Core.ApplicationServices
             {
                 var awareEntity = entity as IContextAware;
 
-                // check if user is part of target organization (he's trying to access)
+                // check if user is part of the target organization (he's trying to access)
                 if (awareEntity.IsInContext(loggedIntoOrganizationId))
                 {
                     // users part of an orgaization have read access to all entities inside the organization

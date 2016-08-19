@@ -260,8 +260,10 @@
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\ItContractRolesController.cs" />
+    <Compile Include="Controllers\OData\ItContractRightsController.cs" />
     <Compile Include="Controllers\OData\ItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
@@ -269,6 +271,7 @@
     <Compile Include="Controllers\OData\ItProjectsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
@@ -421,8 +424,20 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app\components\org\user\user-project-roles.view.html" />
+    <Content Include="app\components\org\user\user-rights.view.html" />
     <Content Include="app\components\reports\reports-overview.html" />
+    <TypeScriptCompile Include="app\components\org\user\user-organization-unit-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-contract-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-system-rights.directive.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-role.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-role.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-unit-role.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
+    <TypeScriptCompile Include="app\models\role-entity.ts" />
+    <TypeScriptCompile Include="app\models\option-entity.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
@@ -594,12 +609,12 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-project-roles.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
-    <TypeScriptCompile Include="app\DirectiveFactory.ts" />
+    <TypeScriptCompile Include="app\directiveFactory.ts" />
     <TypeScriptCompile Include="app\models\api\organization-role.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
@@ -624,8 +639,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="app\kitos.ts" />
     <TypeScriptCompile Include="app\models\access-modifier.ts" />
-    <TypeScriptCompile Include="app\models\admin-rights.ts" />
-    <TypeScriptCompile Include="app\models\admin-role.ts" />
     <TypeScriptCompile Include="app\models\config.ts" />
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
@@ -674,10 +687,10 @@
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
-    <TypeScriptCompile Include="app\models\organization-right.ts" />
-    <TypeScriptCompile Include="app\models\organization-role.ts" />
-    <TypeScriptCompile Include="app\models\organization-type.ts" />
-    <TypeScriptCompile Include="app\models\organization-unit.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-type.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-unit.ts" />
     <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-type-option.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-base.ts" />
@@ -686,7 +699,7 @@
     <TypeScriptCompile Include="app\models\it-contract\it-contract.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
-    <TypeScriptCompile Include="app\models\organization.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />

@@ -1,5 +1,5 @@
 ﻿module Kitos.Models {
-    export interface IUser {
+    export interface IUser extends IEntity {
         Name: string;
         LastName: string;
         PhoneNumber: string;
@@ -8,20 +8,20 @@
         Uuid: any;
         LastAdvisDate: Date;
         /** The admin rights of the user */
-        OrganizationRights: Array<IAdminRight>;
+        OrganizationRights: IOrganizationRight[];
         /** Passwords reset request issued for the user */
-        PasswordResetRequests: Array<IPasswordResetRequest>;
+        PasswordResetRequests: IPasswordResetRequest[];
         /** Wishes created by this user */
-        Wishes: Array<ItSystem.IWish>;
+        Wishes: ItSystem.IWish[];
         /** Gets or sets the  or  associated with this user */
-        ItProjectStatuses: Array<ItProject.IItProjectStatus>;
+        ItProjectStatuses: ItProject.IItProjectStatus[];
         /** Risks associated with this user */
-        ResponsibleForRisks: Array<ItProject.IRisk>;
+        ResponsibleForRisks: ItProject.IRisk[];
         /** Communications associated with this user */
-        ResponsibleForCommunications: Array<ItProject.ICommunication>;
+        ResponsibleForCommunications: ItProject.ICommunication[];
         /** Handovers associated with this user */
-        HandoverParticipants: Array<ItProject.IHandover>;
+        HandoverParticipants: ItProject.IHandover[];
         /** The contracts that the user has been marked as contract signer for */
-        SignerForContracts: Array<ItContract.IItContract>;
+        SignerForContracts: ItContract.IItContract[];
     }
 }

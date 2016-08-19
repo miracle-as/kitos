@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.ItContract;
 
 namespace Core.DomainModel
 {
@@ -16,6 +17,10 @@ namespace Core.DomainModel
         {
             this.PasswordResetRequests = new List<PasswordResetRequest>();
             this.OrganizationRights = new List<OrganizationRight>();
+            this.OrganizationUnitRights = new List<OrganizationUnitRight>();
+            this.ItProjectRights = new List<ItProjectRight>();
+            this.ItSystemRights = new List<ItSystemRight>();
+            this.ItContractRights = new List<ItContractRight>();
             this.Wishes = new List<Wish>();
             this.ItProjectStatuses = new List<ItProjectStatus>();
             this.ResponsibleForRisks = new List<Risk>();
@@ -45,9 +50,29 @@ namespace Core.DomainModel
         public virtual Organization.Organization DefaultOrganization { get; set; }
 
         /// <summary>
-        /// The admin rights of the user
+        /// The admin rights for the user
         /// </summary>
         public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
+
+        /// <summary>
+        /// The organization unit rights for the user
+        /// </summary>
+        public virtual ICollection<OrganizationUnitRight> OrganizationUnitRights { get; set; }
+
+        /// <summary>
+        /// The project rights for the user
+        /// </summary>
+        public virtual ICollection<ItProjectRight> ItProjectRights { get; set; }
+
+        /// <summary>
+        /// The system rights for the user
+        /// </summary>
+        public virtual ICollection<ItSystemRight> ItSystemRights { get; set; }
+
+        /// <summary>
+        /// The system rights for the user
+        /// </summary>
+        public virtual ICollection<ItContractRight> ItContractRights { get; set; }
 
         /// <summary>
         /// Passwords reset request issued for the user

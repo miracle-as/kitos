@@ -1,13 +1,17 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IUserOverview extends Models.IOrganizationRight, Models.IEntity {
+    interface IControllerScope extends ng.IScope {
 
     }
 
-    export class OrganizationUserController {
-        public mainGrid: IKendoGrid<IUserOverview>;
-        public mainGridOptions: IKendoGridOptions<IUserOverview>;
+    interface IGridModel extends Models.IUser {
+        canEdit: boolean;
+    }
+
+    class OrganizationUserController {
+        public mainGrid: IKendoGrid<IGridModel>;
+        public mainGridOptions: IKendoGridOptions<IGridModel>;
 
         public static $inject: string[] = ["$scope", "$http", "$timeout", "_", "$", "$state", "$uibModal", "$q", "$stateParams", "notify", "user"];
 
@@ -28,8 +32,8 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
-                            //url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
+                            //url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
+                            url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
                             dataType: "json"
                         },
                         destroy: {
@@ -44,7 +48,7 @@
                                 const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
 
                                 if (parameterMap.$filter) {
-                                    parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "User.Name");
+                                    parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
                                 }
 
@@ -53,7 +57,7 @@
                         }
                     },
                     sort: {
-                        field: "User.Name",
+                        field: "Name",
                         dir: "asc"
                     },
                     pageSize: 100,
@@ -62,49 +66,28 @@
                     serverFiltering: true,
                     schema: {
                         model: {
-                            id: "Id"
+                            id: "Id",
+                            fields: {
+                                LastAdvisDate: { type: "date" }
+                            }
+                        },
+                        parse: response => {
+                            // iterate each user
+                            this._.forEach(response.value, (user: IGridModel) => {
+                                // set if the user can edit
+                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin) {
+                                    user.canEdit = true;
+                                } else if (this.user.id === user.Id) {
+                                    user.canEdit = true;
+                                } else {
+                                    user.canEdit = false;
+                                }
+
+                                // remove the user role
+                                this._.remove(user.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
+                            });
+                            return response;
                         }
-                        //parse: response => {
-                        //    // iterate each contract
-                        //    this._.forEach(response.value, contract => {
-                        //        // HACK to add economy data to result
-                        //        var ecoData = <Array<any>>this._.where(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
-                        //        contract.Acquisition = this._.sum(ecoData, "Acquisition");
-                        //        contract.Operation = this._.sum(ecoData, "Operation");
-                        //        contract.Other = this._.sum(ecoData, "Other");
-
-                        //        var earliestAuditDate = this._.first(this._.sortByOrder(ecoData, ["AuditDate"], ["desc"]));
-                        //        if (earliestAuditDate && earliestAuditDate.AuditDate) {
-                        //            contract.AuditDate = earliestAuditDate.AuditDate;
-                        //        }
-
-                        //        var totalWhiteStatuses = this._.where(ecoData, { AuditStatus: "White" }).length;
-                        //        var totalRedStatuses = this._.where(ecoData, { AuditStatus: "Red" }).length;
-                        //        var totalYellowStatuses = this._.where(ecoData, { AuditStatus: "Yellow" }).length;
-                        //        var totalGreenStatuses = this._.where(ecoData, { AuditStatus: "Green" }).length;
-
-                        //        contract.status = {
-                        //            max: totalWhiteStatuses + totalRedStatuses + totalYellowStatuses + totalGreenStatuses,
-                        //            white: totalWhiteStatuses,
-                        //            red: totalRedStatuses,
-                        //            yellow: totalYellowStatuses,
-                        //            green: totalGreenStatuses
-                        //        };
-
-                        //        // HACK to flattens the Rights on usage so they can be displayed as single columns
-                        //        contract.roles = [];
-                        //        // iterate each right
-                        //        this._.forEach(contract.Rights, right => {
-                        //            // init an role array to hold users assigned to this role
-                        //            if (!contract.roles[right.RoleId])
-                        //                contract.roles[right.RoleId] = [];
-
-                        //            // push username to the role array
-                        //            contract.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
-                        //        });
-                        //    });
-                        //    return response;
-                        //}
                     }
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
@@ -134,9 +117,10 @@
                     filterable: false
                 },
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
-                    <uib-tab index="0" heading="Static title">Static content</uib-tab>
-                    <uib-tab index="1" heading="Foo">Foo</uib-tab>
-                    <uib-tab index="2" heading="Projekt roller"><user-project-roles name="${dataItem.Id}"></user-project-roles></uib-tab>
+                    <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
+                    <uib-tab index="1" heading="Projekt roller"><user-project-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-project-roles></uib-tab>
+                    <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
+                    <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                 </uib-tabset>`,
                 detailInit: this.detailEvent,
                 //dataBound: this.saveGridOptions,
@@ -147,10 +131,10 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "User.Name", title: "Navn", width: 150,
+                        field: "Name", title: "Navn", width: 150,
                         persistId: "fullname", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
-                        excelTemplate: (dataItem) => `${dataItem.User.Name} ${dataItem.User.LastName}`,
+                        template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
+                        excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         hidden: false,
                         filterable: {
                             cell: {
@@ -161,10 +145,24 @@
                         }
                     },
                     {
-                        field: "User.Email", title: "Email", width: 150,
+                        field: "Email", title: "Email", width: 150,
                         persistId: "email", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.User.Email,
-                        excelTemplate: (dataItem) => dataItem.User.Email,
+                        template: (dataItem) => dataItem.Email,
+                        excelTemplate: (dataItem) => dataItem.Email,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LastAdvisDate", title: "Advis", width: 150,
+                        persistId: "advisdate", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
+                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
                         hidden: false,
                         filterable: {
                             cell: {
@@ -189,12 +187,11 @@
                         }
                     },
                     {
-                        field: "Role", title: "Rolle", width: 150,
+                        field: "OrganizationRights.Role", title: "Rolle", width: 150,
                         persistId: "role", // DON'T YOU DARE RENAME!
                         attributes: { "class": "might-overflow" },
-                        //template: (dataItem) => this._.pluck(dataItem.OrganizationRights, "Role").join(", "),
-                        template: (dataItem) => dataItem.Role.toString(),
-                        //excelTemplate: (dataItem) => this._.pluck(dataItem.OrganizationRights, "Role").join(", "),
+                        template: this.roleTemplate,
+                        excelTemplate: this.roleTemplate,
                         hidden: false,
                         filterable: {
                             cell: {
@@ -205,22 +202,48 @@
                         }
                     },
                     {
-                        command: [{ text: "Redigér", click: this.editRight, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any, "destroy"], title: " ", width: "150px",
-                        persistId: "foo"
+                        command: [
+                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                        ],
+                        title: " ", width: "150px",
+                        persistId: "command"
                     }
                 ]
             };
         }
 
-        private fixNameFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `$1concat(concat(User/Name, ' '), User/LastName)$2`);
+        private roleTemplate = (dataItem: IGridModel) => {
+            var roleNames = this._.pluck(dataItem.OrganizationRights, "Role");
+            this._.forEach(roleNames, (roleName, index) => {
+                switch (roleName) {
+                    case Models.OrganizationRole.LocalAdmin: roleNames[index] = "Lokal Admin"; break;
+                    case Models.OrganizationRole.OrganizationModuleAdmin: roleNames[index] = "Organisations Admin"; break;
+                    case Models.OrganizationRole.ProjectModuleAdmin: roleNames[index] = "Projekt Admin"; break;
+                    case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
+                    case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
+                }
+            });
+            return roleNames.join(",");
         }
 
-        private editRight = (e) => {
+        private fixNameFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
+        }
+
+        private onEdit = (e: JQueryEventObject) => {
+            e.preventDefault();
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
             this.$state.go("organization.user.edit", { id: entityId, userObj: dataItem });
+        }
+
+        private onDelete = (e: JQueryEventObject) => {
+            e.preventDefault();
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = dataItem["Id"];
+            console.log("delete", entityId);
         }
 
         private exportFlag = false;
@@ -453,7 +476,7 @@
         //                    return deferred.resolve();
         //                //Organisation selected
         //                case '1':
-        //                    httpUrl += 'organizationunitrights?orgId=' + this.user.currentOrganizationId;
+        //                    httpUrl += 'organizationunitright?orgId=' + this.user.currentOrganizationId;
         //                    break;
         //                //ITProjects selected
         //                case '2':

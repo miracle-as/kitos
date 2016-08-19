@@ -4,16 +4,16 @@
          * Has read access to everything within the organization,
          * but not write access
          */
-        User,
+        User = "User" as any,
         /** Has write access to everything within the organization */
-        LocalAdmin,
+        LocalAdmin = "LocalAdmin" as any,
         /** Has write access to everything within the organization module */
-        OrganizationModuleAdmin,
+        OrganizationModuleAdmin = "OrganizationModuleAdmin" as any,
         /** Has write access to everything within the project module */
-        ProjectModuleAdmin,
+        ProjectModuleAdmin = "ProjectModuleAdmin" as any,
         /** Has write access to everything within the system module */
-        SystemModuleAdmin,
+        SystemModuleAdmin = "SystemModuleAdmin" as any,
         /** Has write access to everything within the contract module */
-        ContractModuleAdmin
+        ContractModuleAdmin = "ContractModuleAdmin" as any
     }
 }

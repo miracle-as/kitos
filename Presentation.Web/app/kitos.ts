@@ -17,6 +17,7 @@
     export interface IKendoGridOptions<TDataSource> extends kendo.ui.GridOptions {
         toolbar?: IKendoGridToolbarItem[];
         columns?: IKendoGridColumn<TDataSource>[];
+        detailTemplate?: ((dataItem: TDataSource) => string)|string;
     }
 
     export interface IKendoGrid<TDataSource> extends kendo.ui.Grid {
