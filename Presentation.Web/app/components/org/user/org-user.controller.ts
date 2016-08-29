@@ -73,18 +73,18 @@
                         },
                         parse: response => {
                             // iterate each user
-                            this._.forEach(response.value, (user: IGridModel) => {
+                            this._.forEach(response.value, (usr: IGridModel) => {
                                 // set if the user can edit
                                 if (this.user.isGlobalAdmin || this.user.isLocalAdmin) {
-                                    user.canEdit = true;
-                                } else if (this.user.id === user.Id) {
-                                    user.canEdit = true;
+                                    usr.canEdit = true;
+                                } else if (this.user.id === usr.Id) {
+                                    usr.canEdit = true;
                                 } else {
-                                    user.canEdit = false;
+                                    usr.canEdit = false;
                                 }
 
                                 // remove the user role
-                                this._.remove(user.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
+                                this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
                             });
                             return response;
                         }
@@ -122,7 +122,6 @@
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                 </uib-tabset>`,
-                detailInit: this.detailEvent,
                 //dataBound: this.saveGridOptions,
                 //columnResize: this.saveGridOptions,
                 //columnHide: this.saveGridOptions,
@@ -311,10 +310,6 @@
             }
 
             return template;
-        }
-
-        private detailEvent = (e: kendo.ui.GridDetailInitEvent) => {
-            console.log("detail event");
         }
 
         //private isLocalAdmin(selectedUser) {

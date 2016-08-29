@@ -40,6 +40,10 @@
                     serverSorting: true,
                     serverFiltering: true,
                 },
+                noRecords: true,
+                messages: {
+                    noRecords: "Ingen system roller tilknyttet"
+                },
                 columns: [
                     {
                         field: "Object.ItSystem.Name", title: "IT System", width: 150,

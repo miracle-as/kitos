@@ -40,6 +40,10 @@
                     serverSorting: true,
                     serverFiltering: true,
                 },
+                noRecords: true,
+                messages: {
+                    noRecords: "Ingen organisationenheds roller tilknyttet"
+                },
                 columns: [
                     {
                         field: "Object.Name", title: "Organisationsenhed", width: 150,

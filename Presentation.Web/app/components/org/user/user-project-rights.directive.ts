@@ -40,6 +40,10 @@
                     serverSorting: true,
                     serverFiltering: true,
                 },
+                noRecords: true,
+                messages: {
+                    noRecords: "Ingen projekter roller tilknyttet"
+                },
                 columns: [
                     {
                         field: "Object.Name", title: "IT Projekt", width: 150,

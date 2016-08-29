@@ -40,6 +40,10 @@
                     serverSorting: true,
                     serverFiltering: true,
                 },
+                noRecords: true,
+                messages: {
+                    noRecords: "Ingen kontrakt roller tilknyttet"
+                },
                 columns: [
                     {
                         field: "Object.Name", title: "IT Kontrakt", width: 150,
