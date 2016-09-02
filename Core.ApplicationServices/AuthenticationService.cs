@@ -136,12 +136,16 @@ namespace Core.ApplicationServices
                 // check if user is part of target organization (he's trying to access)
                 if (!awareEntity.IsInContext(loggedIntoOrganizationId))
                 {
+                    // Users are not allowd to access objects outside their current context,
+                    // even if they have access in the other context.
+                    // Then they must switch context and try again.
                     return false;
                 }
 
-                // check if local admin in target organization
+                // check if user is local admin in target organization
                 if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
                 {
+                    // local admins have write access to everything within the context
                     return true;
                 }
 
@@ -149,24 +153,28 @@ namespace Core.ApplicationServices
                 if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin)
                     && entity is IContractModule)
                 {
+                    // contract admins have write access to everything deemed part of the contract module
                     return true;
                 }
 
                 if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin)
                     && entity is IOrganizationModule)
                 {
+                    // organization admins have write access to everything deemed part of the organization module
                     return true;
                 }
 
                 if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin)
                     && entity is IProjectModule)
                 {
+                    // project admins have write access to everything deemed part of the project module
                     return true;
                 }
 
                 if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin)
                     && entity is ISystemModule)
                 {
+                    // system admins have write access to everything deemed part of the system module
                     return true;
                 }
 
@@ -179,10 +187,36 @@ namespace Core.ApplicationServices
                 // check if user is object owner
                 if (entity.ObjectOwnerId == user.Id)
                 {
+                    // object owners have write access to their objects if they're within the context,
+                    // else they'll have to switch to the correct context and try again
+                    return true;
+                }
+            }
+            else // the entity is not aware of its context
+            {
+                // check if user is object owner
+                if (entity.ObjectOwnerId == user.Id)
+                {
+                    // the entity is unaware of its context,
+                    // so our only option is to allow the object owner write access
                     return true;
                 }
             }
 
+            // User is a special case
+            if (entity is User)
+            {
+                var userEntity = entity as User;
+
+                // check if the user is trying edit himself
+                if (userEntity.Id == user.Id)
+                {
+                    // a user always has write access to himself
+                    return true;
+                }
+            }
+
+            // all white-list checks failed, deny access
             return false;
         }
     }

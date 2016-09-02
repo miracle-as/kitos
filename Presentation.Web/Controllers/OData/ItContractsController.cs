@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.ApplicationServices;

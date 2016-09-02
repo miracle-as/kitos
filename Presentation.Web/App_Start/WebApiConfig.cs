@@ -42,6 +42,9 @@ namespace Presentation.Web
         {
             var builder = new ODataConventionModelBuilder();
 
+            // BUG with EnableLowerCamelCase http://stackoverflow.com/questions/39269261/odata-complains-about-missing-id-property-when-enabling-camelcasing
+            //builder.EnableLowerCamelCase();
+
             var accessMod = builder.AddEnumType(typeof(AccessModifier));
             accessMod.Namespace = "Kitos";
             var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
@@ -139,11 +142,20 @@ namespace Presentation.Web
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
             orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
 
-            var users = builder.EntitySet<User>(nameof(UsersController).Replace("Controller", string.Empty));
+            var userEntitySetName = nameof(UsersController).Replace("Controller", string.Empty);
+            var users = builder.EntitySet<User>(userEntitySetName);
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
-            users.EntityType.Action("Remove").Parameter<int>("OrganizationId");
+            users.EntityType.Property(x => x.Name).IsRequired();
+            users.EntityType.Property(x => x.LastName).IsRequired();
+            users.EntityType.Property(x => x.Email).IsRequired();
+            users.EntityType.Action("Remove");
+            var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
+            userCreateAction.Parameter<User>("user").OptionalParameter = false;
+            userCreateAction.Parameter<string>("password").OptionalParameter = false;
+            userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
+            userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
 
             var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
             usages.EntityType.HasKey(x => x.Id);

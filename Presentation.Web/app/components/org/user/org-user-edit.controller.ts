@@ -10,19 +10,37 @@
         public lastName: string;
         public phoneNumber: string;
 
+        private userId: number;
+
         public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify"];
 
-        constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance, private $stateParams: ng.ui.IStateParamsService, private $http: IHttpServiceWithCustomConfig, private notify, private user) {
-            console.log($stateParams["id"]);
-            console.log($stateParams["userObj"]);
+        constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private $stateParams: ng.ui.IStateParamsService,
+            private $http: IHttpServiceWithCustomConfig,
+            private notify,
+            private user) {
+            this.userId = $stateParams["id"];
+            var userObj: Models.IUser = $stateParams["userObj"];
+            this.email = userObj.Email;
+            this.name = userObj.Name;
+            this.lastName = userObj.LastName;
+            this.phoneNumber = userObj.PhoneNumber;
         }
 
         public ok() {
-
+            var payload = {
+                name: this.name,
+                lastName: this.lastName,
+                phoneNumber: this.phoneNumber,
+                email: this.email
+            };
+            this.$http.patch(`/odata/Users(${this.userId})`, payload).then(() => {
+                this.$uibModalInstance.close();
+            });
         }
 
         public cancel() {
-            this.$uibModalInstance.close();
+            this.$uibModalInstance.dismiss();
         }
     }
 
@@ -50,7 +68,7 @@
                         }).result.then(() => {
                             // OK
                             // GOTO parent state and reload
-                            $state.go("^");
+                            $state.go("^", null, { reload: true });
                         },
                         () => {
                             // Cancel
