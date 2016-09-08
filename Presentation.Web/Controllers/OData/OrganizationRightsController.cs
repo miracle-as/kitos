@@ -56,5 +56,17 @@ namespace Presentation.Web.Controllers.OData
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        [ODataRoute("Organizations({orgId})/Rights/User")]
+        public IHttpActionResult DeleteRightsForUser(int orgId, ODataActionParameters parameters)
+        {
+            var test = false;
+            if (parameters.ContainsKey("test"))
+            {
+                test = (bool)parameters["test"];
+            }
+
+            return Ok();
+        }
     }
 }

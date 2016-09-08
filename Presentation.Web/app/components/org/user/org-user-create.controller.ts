@@ -46,13 +46,13 @@
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/user", newUser, { handleBusy: true, params: params }).then((result) => {
+            this.$http.post<API.Models.IApiWrapper<any>>("api/user", newUser, { handleBusy: true, params: params }).then((result) => {
                 var userResult = result.data.response;
                 var oId = this.user.currentOrganizationId;
 
                 var data = {
                     userId: userResult.id,
-                    role: Kitos.API.Models.OrganizationRole.User,
+                    role: API.Models.OrganizationRole.User,
                 };
 
                 this.$http.post(`api/OrganizationRight/?rightByOrganizationRight&organizationId=${oId}&userId=${this.user.id}`, data, { handleBusy: true }).then(() => {

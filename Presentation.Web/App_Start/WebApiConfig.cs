@@ -50,8 +50,11 @@ namespace Presentation.Web
             var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
             orgRoles.Namespace = "Kitos";
 
-            var organizationRights = builder.EntitySet<OrganizationRight>("OrganizationRights");
+            var organizationRightEntitySetName = nameof(OrganizationRightsController).Replace("Controller", string.Empty);
+            var organizationRights = builder.EntitySet<OrganizationRight>(organizationRightEntitySetName);
             organizationRights.EntityType.HasKey(x => x.Id);
+            var organizationRightAction = organizationRights.EntityType.Collection.Action("User").ReturnsFromEntitySet<OrganizationRight>(organizationRightEntitySetName);
+            organizationRightAction.Parameter<bool>("test").OptionalParameter = true;
 
             //builder.EntitySet<Advice>("Advices");
             //builder.EntitySet<AgreementElementType>("AgreementElementTypes");

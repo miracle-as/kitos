@@ -38,9 +38,17 @@
                         },
                         destroy: {
                             url: (entity) => {
-                                return `/odata/Organizations(${this.user.currentOrganizationId})/Rights(${entity.Id})`;
+                                return `/odata/Users(${entity.Id})/Remove()`;
                             },
                             dataType: "json"
+                        },
+                        update: {
+                            url: (entity) => {
+                                return `/odata/Users(${entity.Id})`;
+                            },
+                            type: "PATCH",
+                            dataType: "json",
+                            contentType: "application/json"
                         },
                         parameterMap: (options, operation) => {
                             if (operation === "read") {
@@ -68,6 +76,9 @@
                         model: {
                             id: "Id",
                             fields: {
+                                Name: { type: "text" },
+                                LastName: { type: "text" },
+                                Email: { type: "text" },
                                 LastAdvisDate: { type: "date" }
                             }
                         },
@@ -235,7 +246,9 @@
             e.preventDefault();
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
-            this.$state.go("organization.user.edit", { id: entityId, userObj: dataItem });
+            //this.$state.go("organization.user.edit", { id: entityId, userObj: dataItem });
+            dataItem.set("Email", "test@test");
+            this.mainGrid.dataSource.sync();
         }
 
         private onDelete = (e: JQueryEventObject) => {

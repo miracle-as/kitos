@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
-        [ODataRoute("Users({userKey})/Remove()")]
+        [ODataRoute("Users({userKey})/Remove")]
         public IHttpActionResult PostRemove(int userKey)
         {
             var user = Repository.GetByKey(userKey);
@@ -44,23 +44,30 @@ namespace Presentation.Web.Controllers.OData
             if (parameters.ContainsKey("user"))
             {
                 user = parameters["user"] as User;
-                Validate(user);
+                Validate(user); // this will set the ModelState if not valid
             }
 
-            int organizationId = 0;
+            var password = string.Empty;
+            if (parameters.ContainsKey("password"))
+            {
+                password = parameters["password"].ToString();
+            }
+
+            var organizationId = 0;
             if (parameters.ContainsKey("organizationId"))
             {
                 organizationId = (int)parameters["organizationId"];
+                // TODO check if user is allowed to add users to this organization
             }
 
-            bool sendMailOnCreation = false;
+            var sendMailOnCreation = false;
             if (parameters.ContainsKey("sendMailOnCreation"))
             {
                 sendMailOnCreation = (bool)parameters["sendMailOnCreation"];
             }
 
             // user is being created as global admin
-            if (user.IsGlobalAdmin)
+            if (user != null && user.IsGlobalAdmin)
             {
                 // only other global admins can create global admin users
                 if (!_authService.IsGlobalAdmin(UserId))
@@ -74,6 +81,7 @@ namespace Presentation.Web.Controllers.OData
 
             user.ObjectOwnerId = UserId;
             user.LastChangedByUserId = UserId;
+            user.Password = password;
 
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
 
