@@ -1,7 +1,7 @@
 (function (ng, app) {
     'use strict';
     app.directive('uniqueOrgUser', [
-        '$http', 'userService', function ($http, userService) {
+        '$http', 'userService', '_', function ($http, userService, _) {
             return {
                 require: 'ngModel',
                 link: function (scope, element, attrs, ctrl) {
@@ -10,15 +10,20 @@
                         user = result;
                     });
                     var validateAsync = _.debounce(function (email) {
-                        $http.get(attrs.uniqueOrgUser + '?email=' + email + '&orgId=' + user.currentOrganizationId + '&userExistsWithRole')
-                            .success(function () {
-                            ctrl.$setValidity('available', true);
-                            ctrl.$setValidity('lookup', true);
-                            scope.userExists = true;
-                        })
-                            .error(function (data, status) {
-                            //User dosn't exist in organization
-                            scope.userExists = false;
+                        $http.get("/odata/Organizations(" + user.currentOrganizationId + ")/Rights?$filter=User/Email eq '" + email + "'&$select=Role")
+                            .then(function (response) {
+                            if (_.isEmpty(response.data.value)) {
+                                // user doesn't exist in organization
+                                ctrl.$setValidity('lookup', true);
+                                scope.userExists = false;
+                            }
+                            else {
+                                ctrl.$setValidity('lookup', true);
+                                scope.userExists = true;
+                            }
+                        }, function () {
+                            // something went wrong
+                            ctrl.$setValidity('lookup', false);
                         });
                     }, 500);
                     ctrl.$parsers.unshift(function (email) {

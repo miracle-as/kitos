@@ -1,42 +1,92 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
+    interface EditViewModel {
+        name: string;
+        email: string;
+        lastName: string;
+        phoneNumber: string;
+        isLocalAdmin: boolean;
+        isOrgAdmin: boolean;
+        isProjectAdmin: boolean;
+        isSystemAdmin: boolean;
+        isContractAdmin: boolean;
+    }
+
     class EditOrganizationUserController {
-        public checkAvailbleUrl: string;
-        public checkOrgUserUrl: string;
-        public busy: boolean;
-        public name: string;
-        public email: string;
-        public lastName: string;
-        public phoneNumber: string;
+        public vm: EditViewModel;
 
         private userId: number;
+        private originalVm;
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify"];
+        public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "user", "currentUser", "_"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $stateParams: ng.ui.IStateParamsService,
             private $http: IHttpServiceWithCustomConfig,
+            private $q: ng.IQService,
             private notify,
-            private user) {
-            this.userId = $stateParams["id"];
-            var userObj: Models.IUser = $stateParams["userObj"];
-            this.email = userObj.Email;
-            this.name = userObj.Name;
-            this.lastName = userObj.LastName;
-            this.phoneNumber = userObj.PhoneNumber;
+            private user: Models.IUser,
+            private currentUser,
+            private _: ILoDashWithMixins) {
+            this.userId = user.Id;
+            var userVm: EditViewModel = {
+                email: user.Email,
+                name: user.Name,
+                lastName: user.LastName,
+                phoneNumber: user.PhoneNumber,
+                isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
+                isOrgAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.OrganizationModuleAdmin }) !== undefined,
+                isProjectAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ProjectModuleAdmin }) !== undefined,
+                isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
+                isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined
+            };
+            this.originalVm = _.clone(userVm);
+            this.vm = userVm;
+        }
+
+        private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
+            // check if the requested property exsists in the diff
+            if (Object.keys(diffRights).indexOf(property) === -1)
+                return; // if it doesn't then it wasn't changed and we abort
+
+            if (diffRights[property]) {
+                // add role to user
+                let payload: Models.IOrganizationRight = {
+                    UserId: this.userId,
+                    Role: role,
+                    OrganizationId: this.currentUser.currentOrganizationId
+                };
+                return this.$http.post(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights`, payload);
+            } else {
+                // remove role from user
+                let rightsObj = _.find(this.user.OrganizationRights, { Role: role });
+                return this.$http.delete(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights(${rightsObj.Id})`);
+            }
         }
 
         public ok() {
-            var payload = {
-                name: this.name,
-                lastName: this.lastName,
-                phoneNumber: this.phoneNumber,
-                email: this.email
+            // get the changed values
+            var diffRights: any = _.omit(this.vm, (v, k) => this.originalVm[k] === v);
+
+            var promises: ng.IHttpPromise<any>[] = [];
+            promises.push(this.changeRight(diffRights, "isLocalAdmin", Models.OrganizationRole.LocalAdmin));
+            promises.push(this.changeRight(diffRights, "isOrgAdmin", Models.OrganizationRole.OrganizationModuleAdmin));
+            promises.push(this.changeRight(diffRights, "isProjectAdmin", Models.OrganizationRole.ProjectModuleAdmin));
+            promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
+            promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
+
+            var payload: Models.IUser = {
+                Name: this.vm.name,
+                LastName: this.vm.lastName,
+                PhoneNumber: this.vm.phoneNumber,
+                Email: this.vm.email
             };
-            this.$http.patch(`/odata/Users(${this.userId})`, payload).then(() => {
-                this.$uibModalInstance.close();
-            });
+            this.$http.patch(`/odata/Users(${this.userId})`, payload);
+
+            // when all requests are done
+            this.$q.all(promises).then(
+                () => this.$uibModalInstance.close(), // on success: close the modal
+                () => this.notify.addErrorMessage("Fejl. Noget gik galt!")); // on error: display error
         }
 
         public cancel() {
@@ -49,21 +99,26 @@
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
             $stateProvider.state("organization.user.edit", {
                 url: "/:id/edit",
-                params: {
-                    userObj: null // default value
-                },
                 onEnter: [
                     "$state", "$stateParams", "$uibModal",
                     ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService) => {
                         $uibModal.open({
-                            templateUrl: "app/components/org/user/org-user-modal-edit.view.html",
+                            templateUrl: "app/components/org/user/org-user-edit.modal.view.html",
                             // fade in instead of slide from top, fixes strange cursor placement in IE
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",
                             controller: EditOrganizationUserController,
                             controllerAs: "ctrl",
                             resolve: {
-                                user: ["userService", userService => userService.getUser()]
+                                currentUser: ["userService",
+                                    (userService) => userService.getUser()
+                                ],
+                                user: ["$http", "userService",
+                                    ($http: ng.IHttpService, userService) =>
+                                        userService.getUser().then((currentUser) =>
+                                            $http.get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
+                                                .then((response) => response.data))
+                                ]
                             }
                         }).result.then(() => {
                             // OK

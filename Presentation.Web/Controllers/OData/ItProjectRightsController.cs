@@ -24,15 +24,6 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        //[EnableQuery]
-        [ODataRoute("ItProjectRights/Default.Test(orgKey={orgKey})")]
-        public IHttpActionResult GetTest(int orgKey)
-        {
-            // TODO this is an example of how to implement an OData function
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgKey);
-            return Ok(result);
-        }
-
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItProjectRights")]

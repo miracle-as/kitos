@@ -2,8 +2,6 @@
     "use strict";
 
     class CreateOrganizationUserController {
-        public checkAvailbleUrl: string;
-        public checkOrgUserUrl: string;
         public busy: boolean;
         public name: string;
         public email: string;
@@ -17,9 +15,6 @@
                 notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
                 return;
             }
-
-            this.checkAvailbleUrl = "api/user";
-            this.checkOrgUserUrl = "api/user";
 
             autofocus();
             this.busy = false;
@@ -46,26 +41,30 @@
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<API.Models.IApiWrapper<any>>("api/user", newUser, { handleBusy: true, params: params }).then((result) => {
-                var userResult = result.data.response;
-                var oId = this.user.currentOrganizationId;
+            this.$http.post<API.Models.IApiWrapper<any>>("odata/User/Create", newUser, { handleBusy: true, params: params })
+                .then((result) => {
+                    var userResult = result.data.response;
+                    var oId = this.user.currentOrganizationId;
 
-                var data = {
-                    userId: userResult.id,
-                    role: API.Models.OrganizationRole.User,
-                };
+                    var data = {
+                        userId: userResult.id,
+                        role: API.Models.OrganizationRole.User,
+                    };
 
-                this.$http.post(`api/OrganizationRight/?rightByOrganizationRight&organizationId=${oId}&userId=${this.user.id}`, data, { handleBusy: true }).then(() => {
-                    msg.toSuccessMessage(`${userResult.fullName} er oprettet i KITOS`);
+                    this.$http.post(`api/OrganizationRight/?rightByOrganizationRight&organizationId=${oId}&userId=${this.user.id}`, data, { handleBusy: true })
+                        .then(() => {
+                            msg.toSuccessMessage(`${newUser.name} ${newUser.lastName} er oprettet i KITOS`);
+                        }, () => {
+                            msg.toErrorMessage(`Kunne ikke tilknytte ${newUser.name} ${newUser.lastName} til organisationen!`);
+                        }
+                    );
+
+                    this.cancel();
                 }, () => {
-                    msg.toErrorMessage(`Kunne ikke tilknytte ${this.user.fullName} til organisationen!`);
-                });
-
-                this.$uibModalInstance.close(userResult);
-            }, () => {
-                msg.toErrorMessage(`Fejl! Noget gik galt ved oprettelsen af ${newUser.name}!`);
-                this.$uibModalInstance.close();
-            });
+                    msg.toErrorMessage(`Fejl! Noget gik galt ved oprettelsen af ${newUser.name} ${newUser.lastName}!`);
+                    this.cancel();
+                }
+            );
         }
     }
 
@@ -78,7 +77,7 @@
                     "$state", "$stateParams", "$uibModal",
                     ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService) => {
                         $uibModal.open({
-                            templateUrl: "app/components/org/user/org-user-modal-create.view.html",
+                            templateUrl: "app/components/org/user/org-user-create.modal.view.html",
                             // fade in instead of slide from top, fixes strange cursor placement in IE
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",

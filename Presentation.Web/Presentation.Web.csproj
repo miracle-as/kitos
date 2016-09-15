@@ -439,6 +439,7 @@
     <TypeScriptCompile Include="app\models\role-entity.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
+    <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
@@ -573,8 +574,8 @@
     <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
     <Content Include="app\components\org\structure\org-structure.view.html" />
     <Content Include="app\components\org\overview\org-overview-usage.view.html" />
-    <Content Include="app\components\org\user\org-user-modal-create.view.html" />
-    <Content Include="app\components\org\user\org-user-modal-edit.view.html" />
+    <Content Include="app\components\org\user\org-user-create.modal.view.html" />
+    <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
     <Content Include="app\components\org\user\org-user.view.html" />
     <Content Include="app\shared\organization-tree-item.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-modal-create.view.html" />

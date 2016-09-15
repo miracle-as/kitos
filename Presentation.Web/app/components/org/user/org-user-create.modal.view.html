@@ -8,7 +8,7 @@
                 Email-adresse
             </label>
             <div class="col-md-8">
-                <input type="email" name="email" id="email" data-ng-model="ctrl.email" class="form-control" data-ng-required="true" data-unique-org-user="{{ ctrl.checkAvailbleUrl }}" data-unique-email="{{ ctrl.checkAvailbleUrl }}" autofocus data-ng-disabled="ctrl.busy">
+                <input type="email" name="email" id="email" data-ng-model="ctrl.email" class="form-control" data-ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy">
                 <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': ctrl.createForm.name.$invalid && ctrl.createForm.name.$dirty, 'glyphicon-ok': ctrl.createForm.name.$valid }"></span>
             </div>
         </div>
@@ -42,6 +42,28 @@
             </label>
             <div class="col-md-8">
                 <input type="text" name="phoneNumber" id="phoneNumber" data-ng-model="ctrl.phoneNumber" class="form-control" data-ng-required="false" data-ng-disabled="ctrl.busy" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="roller" class="col-md-3 control-label">
+                Roller
+            </label>
+            <div class="col-md-8">
+                <div class="checkbox">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isLocalAdmin">Lokal admin</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isOrgAdmin">Organisation admin</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isProjectAdmin">Projekt admin</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isSystemAdmin">System admin</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isContractAdmin">Kontrakt admin</label>
+                </div>
             </div>
         </div>
         <div class="form-group">

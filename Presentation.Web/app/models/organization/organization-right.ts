@@ -1,5 +1,5 @@
 ﻿module Kitos.Models {
-    export interface IOrganizationRight {
+    export interface IOrganizationRight extends IEntity {
         UserId?: number;
         User?: IUser;
         Name?: string;
