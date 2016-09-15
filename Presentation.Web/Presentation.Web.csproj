@@ -439,6 +439,7 @@
     <TypeScriptCompile Include="app\models\role-entity.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
+    <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />

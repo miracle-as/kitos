@@ -8,12 +8,10 @@ namespace Presentation.Web.Controllers.OData
     [Authorize]
     public abstract class BaseController<T> : ODataController where T : class
     {
-        protected ODataValidationSettings ValidationSettings;
         protected readonly IGenericRepository<T> Repository;
 
         protected BaseController(IGenericRepository<T> repository)
         {
-            ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
         }
 

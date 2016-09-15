@@ -32,21 +32,13 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            //url: `/odata/Organizations(${this.user.currentOrganizationId})/Rights?$expand=User,ObjectOwner`,
                             url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
                             dataType: "json"
                         },
                         destroy: {
                             url: (entity) => {
-                                return `/odata/Users(${entity.Id})/Remove()`;
+                                return `/odata/Organizations(${this.user.currentOrganizationId})/RemoveUser()`;
                             },
-                            dataType: "json"
-                        },
-                        update: {
-                            url: (entity) => {
-                                return `/odata/Users(${entity.Id})`;
-                            },
-                            type: "PATCH",
                             dataType: "json",
                             contentType: "application/json"
                         },
@@ -62,6 +54,15 @@
 
                                 return parameterMap;
                             }
+
+                            if (operation === "destroy") {
+                                var requestBody = {
+                                    userId: options["Id"]
+                                };
+                                return kendo.stringify(requestBody);
+                            }
+
+                            return kendo.stringify(options);
                         }
                     },
                     sort: {
@@ -246,9 +247,7 @@
             e.preventDefault();
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
-            //this.$state.go("organization.user.edit", { id: entityId, userObj: dataItem });
-            dataItem.set("Email", "test@test");
-            this.mainGrid.dataSource.sync();
+            this.$state.go("organization.user.edit", { id: entityId });
         }
 
         private onDelete = (e: JQueryEventObject) => {
@@ -256,6 +255,8 @@
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
             console.log("delete", entityId);
+            this.mainGrid.dataSource.remove(dataItem);
+            this.mainGrid.dataSource.sync();
         }
 
         private exportFlag = false;

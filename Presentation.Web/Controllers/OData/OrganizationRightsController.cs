@@ -25,19 +25,44 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/Rights
         [EnableQuery]
-        [ODataRoute("Organizations({orgId})/Rights")]
-        public IHttpActionResult GetRights(int orgId)
+        [ODataRoute("Organizations({orgKey})/Rights")]
+        public IHttpActionResult GetRights(int orgKey)
         {
-            var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgId);
+            var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgKey);
             return Ok(result);
         }
 
-        // DELETE /Organizations(1)/Rights(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/Rights({id})")]
-        public IHttpActionResult DeleteRights(int orgId, int id)
+        // POST /Organizations(1)/Rights
+        [ODataRoute("Organizations({orgKey})/Rights")]
+        public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgId && m.Id == id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
+
+            entity.OrganizationId = orgKey;
+            entity.ObjectOwnerId = UserId;
+            entity.LastChangedByUserId = UserId;
+
+            try
+            {
+                entity = Repository.Insert(entity);
+                Repository.Save();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+
+            return Created(entity);
+        }
+
+        // DELETE /Organizations(1)/Rights(1)
+        [ODataRoute("Organizations({orgKey})/Rights({key})")]
+        public IHttpActionResult DeleteRights(int orgKey, int key)
+        {
+            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
             if (entity == null)
                 return NotFound();
 
@@ -46,7 +71,7 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                Repository.DeleteByKey(id);
+                Repository.DeleteByKey(key);
                 Repository.Save();
             }
             catch (Exception e)
@@ -57,8 +82,8 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [ODataRoute("Organizations({orgId})/Rights/User")]
-        public IHttpActionResult DeleteRightsForUser(int orgId, ODataActionParameters parameters)
+        [ODataRoute("Organizations({orgKey})/Rights/User")]
+        public IHttpActionResult DeleteRightsForUser(int orgKey, ODataActionParameters parameters)
         {
             var test = false;
             if (parameters.ContainsKey("test"))

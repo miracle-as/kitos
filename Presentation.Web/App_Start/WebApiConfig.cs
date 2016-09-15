@@ -99,9 +99,6 @@ namespace Presentation.Web
 
             var itProjectRights = builder.EntitySet<ItProjectRight>(nameof(ItProjectRightsController).Replace("Controller", string.Empty));
             itProjectRights.EntityType.HasKey(x => x.Id);
-            var itProjectRightsFunc = itProjectRights.EntityType.Collection.Function("Test")
-                .ReturnsCollection<ItProjectRight>();
-            itProjectRightsFunc.Parameter<int>("orgKey");
 
             var itProjectRoles = builder.EntitySet<ItProjectRole>(nameof(ItProjectRolesController).Replace("Controller", string.Empty));
             itProjectRoles.EntityType.HasKey(x => x.Id);
@@ -139,6 +136,10 @@ namespace Presentation.Web
             var organizations = builder.EntitySet<Organization>(nameof(OrganizationsController).Replace("Controller", string.Empty));
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
+            var removeUserAction = organizations.EntityType.Action("RemoveUser");
+            removeUserAction.Parameter<int>("userId").OptionalParameter = false;
+            var addUserAction = organizations.EntityType.Action("AddUser");
+            addUserAction.Parameter<int>("userId").OptionalParameter = false;
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.EntityType.HasKey(x => x.Id);
@@ -153,12 +154,13 @@ namespace Presentation.Web
             users.EntityType.Property(x => x.Name).IsRequired();
             users.EntityType.Property(x => x.LastName).IsRequired();
             users.EntityType.Property(x => x.Email).IsRequired();
-            users.EntityType.Action("Remove");
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
             userCreateAction.Parameter<string>("password").OptionalParameter = false;
             userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
             userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
+            var userCheckEmailFunction = users.EntityType.Collection.Function("EmailAvailable").Returns<bool>();
+            userCheckEmailFunction.Parameter<string>("string").OptionalParameter = false;
 
             var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
             usages.EntityType.HasKey(x => x.Id);
