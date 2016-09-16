@@ -1,20 +1,48 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
+    interface ICreateViewModel {
+        name: string;
+        email: string;
+        lastName: string;
+        phoneNumber: string;
+        isLocalAdmin: boolean;
+        isOrgAdmin: boolean;
+        isProjectAdmin: boolean;
+        isSystemAdmin: boolean;
+        isContractAdmin: boolean;
+    }
+
     class CreateOrganizationUserController {
         public busy: boolean;
-        public name: string;
-        public email: string;
-        public lastName: string;
-        public phoneNumber: string;
+        public vm: ICreateViewModel;
+        public isUserGlobalAdmin = false;
+        public isUserLocalAdmin = false;
+        public isUserOrgAdmin = false;
+        public isUserProjectAdmin = false;
+        public isUserSystemAdmin = false;
+        public isUserContractAdmin = false;
 
-        public static $inject: string[] = ["$uibModalInstance", "$http", "notify", "autofocus", "user"];
+        public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
 
-        constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance, private $http: IHttpServiceWithCustomConfig, private notify, private autofocus, private user) {
+        constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private $http: IHttpServiceWithCustomConfig,
+            private $q: ng.IQService,
+            private notify,
+            private autofocus,
+            private user: Kitos.Services.IUser,
+            private _: _.LoDashStatic) {
             if (!user.currentOrganizationId) {
                 notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
                 return;
             }
+
+            this.isUserGlobalAdmin = user.isGlobalAdmin;
+            this.isUserLocalAdmin = user.isLocalAdmin;
+            this.isUserOrgAdmin = user.isOrgAdmin;
+            this.isUserProjectAdmin = user.isProjectAdmin;
+            this.isUserSystemAdmin = user.isSystemAdmin;
+            this.isUserContractAdmin = user.isContractAdmin;
 
             autofocus();
             this.busy = false;
@@ -24,47 +52,88 @@
             this.$uibModalInstance.close();
         }
 
-        public create(sendMail) {
+        public create(sendMail: boolean) {
             this.busy = true;
-            var newUser = {
-                name: this.name,
-                email: this.email,
-                lastName: this.lastName,
-                phoneNumber: this.phoneNumber
+            var userPayload: Models.ICreateUserPayload = {
+                user: {
+                    Name: this.vm.name,
+                    LastName: this.vm.lastName,
+                    Email: this.vm.email,
+                    PhoneNumber: this.vm.phoneNumber
+                },
+                organizationId: this.user.currentOrganizationId,
+                sendMailOnCreation: sendMail
             };
-
-            const params: { organizationId; sendMailOnCreation; } = { organizationId: this.user.currentOrganizationId, sendMailOnCreation: null };
-            // set params if sendMail is true
-            if (sendMail) {
-                params.sendMailOnCreation = sendMail;
-            }
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<API.Models.IApiWrapper<any>>("odata/User/Create", newUser, { handleBusy: true, params: params })
-                .then((result) => {
-                    var userResult = result.data.response;
-                    var oId = this.user.currentOrganizationId;
+            this.$http.post<Models.IUser>("odata/User/Create", userPayload, { handleBusy: true })
+                .then((response) => {
+                    var userResult = response.data;
 
-                    var data = {
-                        userId: userResult.id,
-                        role: API.Models.OrganizationRole.User,
-                    };
+                    var promises: ng.IHttpPromise<any>[] = [];
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.User));
+                    if (this.vm.isLocalAdmin)
+                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.LocalAdmin));
+                    if (this.vm.isOrgAdmin)
+                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.OrganizationModuleAdmin));
+                    if (this.vm.isProjectAdmin)
+                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ProjectModuleAdmin));
+                    if (this.vm.isSystemAdmin)
+                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.SystemModuleAdmin));
+                    if (this.vm.isContractAdmin)
+                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
 
-                    this.$http.post(`api/OrganizationRight/?rightByOrganizationRight&organizationId=${oId}&userId=${this.user.id}`, data, { handleBusy: true })
-                        .then(() => {
-                            msg.toSuccessMessage(`${newUser.name} ${newUser.lastName} er oprettet i KITOS`);
-                        }, () => {
-                            msg.toErrorMessage(`Kunne ikke tilknytte ${newUser.name} ${newUser.lastName} til organisationen!`);
-                        }
-                    );
-
-                    this.cancel();
+                    // when all requests are done
+                    this.$q.all(promises).then(
+                        () => {
+                            msg.toSuccessMessage(`${this.vm.name} ${this.vm.lastName} er oprettet i KITOS`);
+                            this.cancel();
+                        },
+                        () => msg.toErrorMessage(`Kunne ikke tilknytte ${this.vm.name} ${this.vm.lastName} til organisationen!`)); // on error: display error
                 }, () => {
-                    msg.toErrorMessage(`Fejl! Noget gik galt ved oprettelsen af ${newUser.name} ${newUser.lastName}!`);
+                    msg.toErrorMessage(`Fejl! Noget gik galt ved oprettelsen af ${this.vm.name} ${this.vm.lastName}!`);
                     this.cancel();
                 }
             );
+        }
+
+        private addRole(organizationId: number, userId: number, role: Models.OrganizationRole): ng.IHttpPromise<Models.IOrganizationRight> {
+            var rightsPayload = {
+                UserId: userId,
+                Role: role,
+            };
+
+            return this.$http.post<Models.IOrganizationRight>(`odata/Organizations(${organizationId})/Rights`, rightsPayload);
+        }
+
+        public attachUser() {
+            var msg = this.notify.addInfoMessage("Tilknytter bruger", false);
+
+            this.$http.get<Models.IODataResult<Models.IUser>>(`odata/Users?$filter=Email eq '${this.vm.email}'`).then((response) => {
+                var userResult = this._.first(response.data.value);
+
+                var promises: ng.IHttpPromise<any>[] = [];
+                promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.User));
+                if (this.vm.isLocalAdmin)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.LocalAdmin));
+                if (this.vm.isOrgAdmin)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.OrganizationModuleAdmin));
+                if (this.vm.isProjectAdmin)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ProjectModuleAdmin));
+                if (this.vm.isSystemAdmin)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.SystemModuleAdmin));
+                if (this.vm.isContractAdmin)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
+
+                // when all requests are done
+                this.$q.all(promises).then(
+                    () => {
+                        msg.toSuccessMessage(`${userResult.Name} ${userResult.LastName} er tilknyttet til organisationen`);
+                        this.cancel();
+                    },
+                    (reason) => msg.toErrorMessage(`Kunne ikke tilknytte ${userResult.Name} ${userResult.LastName} til organisationen!`)); // on error: display error
+            });
         }
     }
 

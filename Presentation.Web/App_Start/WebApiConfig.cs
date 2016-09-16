@@ -156,7 +156,6 @@ namespace Presentation.Web
             users.EntityType.Property(x => x.Email).IsRequired();
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
-            userCreateAction.Parameter<string>("password").OptionalParameter = false;
             userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
             userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
             var userCheckEmailFunction = users.EntityType.Collection.Function("IsEmailAvailable").Returns<bool>();

@@ -41,12 +41,6 @@ namespace Presentation.Web.Controllers.OData
                 Validate(user); // this will set the ModelState if not valid - it doesn't http://stackoverflow.com/questions/39484185/model-validation-in-odatacontroller
             }
 
-            var password = string.Empty;
-            if (parameters.ContainsKey("password"))
-            {
-                password = parameters["password"].ToString();
-            }
-
             var organizationId = 0;
             if (parameters.ContainsKey("organizationId"))
             {
@@ -80,7 +74,6 @@ namespace Presentation.Web.Controllers.OData
 
             user.ObjectOwnerId = UserId;
             user.LastChangedByUserId = UserId;
-            user.Password = password;
 
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
 

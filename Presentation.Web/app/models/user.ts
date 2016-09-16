@@ -24,4 +24,18 @@
         /** The contracts that the user has been marked as contract signer for */
         SignerForContracts?: ItContract.IItContract[];
     }
+
+    export interface ICreateUser {
+        Name: string;
+        LastName: string;
+        Email: string;
+        PhoneNumber?: string;
+        IsGlobalAdmin?: boolean;
+    }
+
+    export interface ICreateUserPayload {
+        user: ICreateUser;
+        organizationId: number;
+        sendMailOnCreation?: boolean;
+    }
 }

@@ -39,8 +39,6 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-
-
             entity.OrganizationId = orgKey;
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;

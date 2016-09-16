@@ -1,7 +1,7 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface EditViewModel {
+    interface IEditViewModel {
         name: string;
         email: string;
         lastName: string;
@@ -14,7 +14,13 @@
     }
 
     class EditOrganizationUserController {
-        public vm: EditViewModel;
+        public vm: IEditViewModel;
+        public isUserGlobalAdmin = false;
+        public isUserLocalAdmin = false;
+        public isUserOrgAdmin = false;
+        public isUserProjectAdmin = false;
+        public isUserSystemAdmin = false;
+        public isUserContractAdmin = false;
 
         private userId: number;
         private originalVm;
@@ -26,10 +32,10 @@
             private $q: ng.IQService,
             private notify,
             private user: Models.IUser,
-            private currentUser,
+            private currentUser: Services.IUser,
             private _: ILoDashWithMixins) {
             this.userId = user.Id;
-            var userVm: EditViewModel = {
+            var userVm: IEditViewModel = {
                 email: user.Email,
                 name: user.Name,
                 lastName: user.LastName,
@@ -42,6 +48,13 @@
             };
             this.originalVm = _.clone(userVm);
             this.vm = userVm;
+
+            this.isUserGlobalAdmin = currentUser.isGlobalAdmin;
+            this.isUserLocalAdmin = currentUser.isLocalAdmin;
+            this.isUserOrgAdmin = currentUser.isOrgAdmin;
+            this.isUserProjectAdmin = currentUser.isProjectAdmin;
+            this.isUserSystemAdmin = currentUser.isSystemAdmin;
+            this.isUserContractAdmin = currentUser.isContractAdmin;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
