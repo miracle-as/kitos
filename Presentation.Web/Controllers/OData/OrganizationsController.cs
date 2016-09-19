@@ -38,24 +38,6 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [ODataRoute("Organizations({orgKey})/AddUser")]
-        public IHttpActionResult PostAddUserToOrganization(int orgKey, ODataActionParameters parameters)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userId = 0;
-            if (parameters.ContainsKey("userId"))
-            {
-                userId = (int)parameters["userId"];
-                // TODO check if user is allowed to add users to this organization
-            }
-
-            //_organizationService.RemoveUser(orgKey, userId); TODO
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/LastChangedByUser")]
         public virtual IHttpActionResult GetLastChangedByUser(int orgKey)

@@ -57,8 +57,6 @@ namespace Presentation.Web
             var organizationRightEntitySetName = nameof(OrganizationRightsController).Replace("Controller", string.Empty);
             var organizationRights = builder.EntitySet<OrganizationRight>(organizationRightEntitySetName);
             organizationRights.EntityType.HasKey(x => x.Id);
-            var organizationRightAction = organizationRights.EntityType.Collection.Action("User").ReturnsFromEntitySet<OrganizationRight>(organizationRightEntitySetName);
-            organizationRightAction.Parameter<bool>("test").OptionalParameter = true;
 
             //builder.EntitySet<Advice>("Advices");
             //builder.EntitySet<AgreementElementType>("AgreementElementTypes");
@@ -142,8 +140,6 @@ namespace Presentation.Web
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
             var removeUserAction = organizations.EntityType.Action("RemoveUser");
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
-            var addUserAction = organizations.EntityType.Action("AddUser");
-            addUserAction.Parameter<int>("userId").OptionalParameter = false;
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.EntityType.HasKey(x => x.Id);

@@ -72,14 +72,14 @@
                 return this.$http.post(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights`, payload);
             } else {
                 // remove role from user
-                let rightsObj = _.find(this.user.OrganizationRights, { Role: role });
+                let rightsObj = this._.find(this.user.OrganizationRights, { Role: role });
                 return this.$http.delete(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights(${rightsObj.Id})`);
             }
         }
 
         public ok() {
             // get the changed values
-            var diffRights: any = _.omit(this.vm, (v, k) => this.originalVm[k] === v);
+            var diffRights: any = this._.omitBy(this.vm, (v, k) => this.originalVm[k] === v);
 
             var promises: ng.IHttpPromise<any>[] = [];
             promises.push(this.changeRight(diffRights, "isLocalAdmin", Models.OrganizationRole.LocalAdmin));

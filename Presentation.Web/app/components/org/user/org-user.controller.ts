@@ -297,7 +297,6 @@
             e.preventDefault();
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
-            console.log("delete", entityId);
             this.mainGrid.dataSource.remove(dataItem);
             this.mainGrid.dataSource.sync();
         }
