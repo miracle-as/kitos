@@ -99,9 +99,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
         public IHttpActionResult GetDefaultOrganizationForUsers(int orgKey)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
             return Ok(result);

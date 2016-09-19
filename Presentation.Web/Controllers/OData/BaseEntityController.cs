@@ -5,6 +5,7 @@ using Core.ApplicationServices;
 using System.Net;
 using System;
 using Core.DomainModel;
+using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -19,29 +20,29 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public virtual IHttpActionResult Get()
+        public override IHttpActionResult Get()
         {
-            if (CurentUser == null)
+            if (UserId == 0)
                 return Unauthorized();
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
 
-            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser) || hasOrg == false)
+            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
                 return Ok(Repository.AsQueryable());
 
-            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == CurrentOrganizationId));
+            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)));
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public virtual IHttpActionResult Get(int key)
+        public override IHttpActionResult Get(int key)
         {
-            IQueryable<T> result = Repository.AsQueryable().Where(p => p.Id == key);
+            var result = Repository.AsQueryable().Where(p => p.Id == key);
 
             if (!result.Any())
                 return NotFound();
 
             var entity = result.First();
-            if (!AuthenticationService.HasReadAccess(UserId, entity))
+            if (!_authService.HasReadAccess(UserId, entity))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
@@ -53,9 +54,9 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
             return Ok(result);
@@ -77,10 +78,9 @@ namespace Presentation.Web.Controllers.OData
                 entity.ObjectOwnerId = UserId;
                 entity.LastChangedByUserId = UserId;
                 var entityWithOrganization = entity as IHasOrganization;
-                if (entityWithOrganization != null && CurentUser.DefaultOrganizationId.HasValue)
+                if (entityWithOrganization != null)
                 {
-                    entityWithOrganization.OrganizationId = CurentUser.DefaultOrganizationId.Value;
-                    entityWithOrganization.Organization = CurentUser.DefaultOrganization;
+                    entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
                 }
                 entity = Repository.Insert(entity);
                 Repository.Save();

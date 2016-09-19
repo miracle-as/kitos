@@ -6,7 +6,6 @@ using Core.DomainServices;
 using System.Linq;
 using System.Security.Authentication;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices
 {
@@ -58,9 +57,9 @@ namespace Core.ApplicationServices
             return user != null;
         }
 
-        public bool HasReadAccessOutsideContext(User user)
+        public bool HasReadAccessOutsideContext(int userId)
         {
-            AssertUserIsNotNull(user);
+            var user = _userRepository.GetByKey(userId);
 
             if (user.IsGlobalAdmin)
                 return true;
@@ -70,36 +69,22 @@ namespace Core.ApplicationServices
             return user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality;
         }
 
-        public bool HasReadAccessOutsideContext(int userId)
-        {
-            var user = _userRepository.GetByKey(userId);
-            AssertUserIsNotNull(user);
-
-            return HasReadAccessOutsideContext(user);
-        }
-
-        public bool HasReadAccess(int userId, Entity entity)
-        {
-            var user = _userRepository.GetByKey(userId);
-            AssertUserIsNotNull(user);
-
-            return HasReadAccess(user, entity);
-        }
-
-
         /// <summary>
         /// Checks if the user have read access to a given instance.
         /// </summary>
-        /// <param name="user">The user.</param>
+        /// <param name="userId">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
-        public bool HasReadAccess(User user, Entity entity)
+        public bool HasReadAccess(int userId, Entity entity)
         {
-            AssertUserIsNotNull(user);
-
-            // global admin always have access
+            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            // check if global admin
             if (user.IsGlobalAdmin)
+            {
+                // global admin always have access
                 return true;
+            }
 
             if (entity is IContextAware) // TODO I don't like this impl
             {
@@ -232,6 +217,13 @@ namespace Core.ApplicationServices
 
             // all white-list checks failed, deny access
             return false;
+        }
+
+        public int GetCurrentOrganizationId(int userId)
+        {
+            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            return loggedIntoOrganizationId;
         }
 
         // ReSharper disable once UnusedParameter.Local

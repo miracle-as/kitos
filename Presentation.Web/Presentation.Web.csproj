@@ -447,12 +447,13 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appReport\locales\nb-NO.xml" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
-	<TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
-	<TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-role.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-role.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-role.ts" />
@@ -461,11 +462,13 @@
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
-	<TypeScriptCompile Include="appReport\index.d.ts" />
+    <TypeScriptCompile Include="appReport\index.d.ts" />
     <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
     <TypeScriptCompile Include="appReport\reportApp.module.ts" />
     <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
+    <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
+    <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
@@ -473,7 +476,6 @@
     <TypeScriptCompile Include="app\shared\disabledOnBusy.directive.ts" />
     <TypeScriptCompile Include="app\components\global-config\globalOptionList\globalOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\global-config\globalOptionRoleList\globalOptionRoleList.directive.ts" />
-    <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
@@ -875,7 +877,6 @@
     <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
     <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />
-	<TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
     <TypeScriptCompile Include="app\services\httpBusyInterceptor.ts" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />

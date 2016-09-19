@@ -1,6 +1,5 @@
 ﻿using System.Web.Http;
 using System.Web.OData;
-using System.Web.OData.Query;
 using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData

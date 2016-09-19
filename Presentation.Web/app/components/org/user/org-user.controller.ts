@@ -268,7 +268,7 @@
         }
 
         private roleTemplate = (dataItem: IGridModel) => {
-            var roleNames = this._.pluck(dataItem.OrganizationRights, "Role");
+            var roleNames = this._.map(dataItem.OrganizationRights, "Role");
             this._.forEach(roleNames, (roleName, index) => {
                 switch (roleName) {
                     case Models.OrganizationRole.LocalAdmin: roleNames[index] = "Lokal Admin"; break;

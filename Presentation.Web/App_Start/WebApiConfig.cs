@@ -207,7 +207,7 @@ namespace Presentation.Web
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
 
-            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>(nameof(ItInterfaceUsesController).Replace("Controller", string.Empty));
+            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>(nameof(ItInterfaceUsesEntityController).Replace("Controller", string.Empty));
             itInterfaceUse.EntityType
                 .HasKey(x => x.ItSystemId)
                 .HasKey(x => x.ItInterfaceId);

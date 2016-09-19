@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.ApplicationServices;
@@ -65,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, entity))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+                return StatusCode(HttpStatusCode.Forbidden);
 
             try
             {
