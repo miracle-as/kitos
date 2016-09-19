@@ -380,20 +380,6 @@
                             }
                         }
                     },
-                    // MySQL ERROR: String was not recognized as a valid Boolean
-                    //{
-                    //    field: "ItSystemUsages.ItSystem.Name", title: "IT System", width: 150,
-                    //    persistId: "sysnames", // DON'T YOU DARE RENAME!
-                    //    template: "#: Parent ? Parent.Name : '' #",
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
@@ -530,7 +516,7 @@
                         field: "Assignments", title: "Opgaver", width: 150,
                         persistId: "assignments", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment")).length.toString(),
+                        template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.includes(n["@odata.type"], "Assignment")).length.toString(),
                         filterable: false,
                         sortable: false
                     },
@@ -641,7 +627,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index

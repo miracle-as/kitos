@@ -22,7 +22,7 @@
                     function saveIfNew() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -37,7 +37,7 @@
                     function saveDate() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -65,7 +65,7 @@
                         });
                     }
 
-                    function saveSelect2() {
+                    function saveSelectUi() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function() {
@@ -73,7 +73,7 @@
 
                             var viewValue = ctrl.$viewValue;
                             if (angular.isArray(viewValue)) {
-                                newValue = _.pluck(viewValue, 'id');
+                                newValue = _.map(viewValue, 'id');
                             } else if (angular.isObject(viewValue)) {
                                 newValue = viewValue.id;
                             } else {
@@ -87,7 +87,7 @@
                         });
                     }
 
-                    function saveMultipleSelect2(e) {
+                    function saveMultipleSelectUi(e) {
                         var id, msg = notify.addInfoMessage("Gemmer...", false);
                         if (e.added) {
                             id = e.added.id;
@@ -129,12 +129,12 @@
                             });
                     }
 
-                    // select2 fields trigger the change event
-                    if (!angular.isUndefined(attrs.uiSelect2)) {
+                    // ui select fields trigger the change event
+                    if (!angular.isUndefined(attrs.uiSelect)) {
                         if (attrs.multiple) {
-                            element.bind('change', saveMultipleSelect2);
+                            element.bind('change', saveMultipleSelectUi);
                         } else {
-                            element.bind('change', saveSelect2);
+                            element.bind('change', saveSelectUi);
                         }
                         // kendo date picker
                     } else if (!angular.isUndefined(attrs.kendoDatePicker)) {

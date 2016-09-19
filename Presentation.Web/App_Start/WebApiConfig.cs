@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -7,6 +8,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.OData;
 
@@ -16,6 +18,7 @@ namespace Presentation.Web
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
             var apiCfg = config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
@@ -36,6 +39,7 @@ namespace Presentation.Web
             config.EnableEnumPrefixFree(true);
             config.EnableCaseInsensitive(true);
             config.EnableUnqualifiedNameCall(true);
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
         }
 
         public static IEdmModel GetModel()
@@ -65,7 +69,7 @@ namespace Presentation.Web
             //builder.EntitySet<IContractType>("ItContractTypes");
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
-            dataRowUsage.EntityType.HasKey(x => new {x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId});
+            dataRowUsage.EntityType.HasKey(x => new { x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
             //builder.EntitySet<EconomyYear>("EconomyYears");
 
@@ -241,6 +245,9 @@ namespace Presentation.Web
             //builder.EntitySet<Text>("Texts");
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
+
+            builder.EntitySet<Report>("Reports").EntityType.HasKey(x => x.Id);
+            builder.EntitySet<ReportCategoryType>("ReportCategories").EntityType.HasKey(x => x.Id);
 
             return builder.GetEdmModel();
         }

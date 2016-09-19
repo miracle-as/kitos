@@ -4,7 +4,7 @@ module.exports = {
     // library script bundle
     // not minified!
     librarySrc: [
-        bower("/lodash/lodash.min.js"),
+        bower("/lodash/dist/lodash.min.js"),
         bower("/jquery/dist/jquery.min.js"),
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
@@ -15,13 +15,18 @@ module.exports = {
 
     libraryStylesSrc: [
         bower("/bootstrap/dist/css/bootstrap.min.css"),
-        bower("/bootstrap/dist/css/bootstrap.min.css"),
-        // bower("/bootstrap/dist/css/bootstrap-theme.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
-        bower("/select2/select2.css"),
+        bower("/select/dist/select.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
+
+    // stimulsoftSrc: [
+    //     script("/stimulsoft/stimulsoft.reports.js"),
+    //     script("/stimulsoft/stimulsoft.viewer.js"),
+    //     script("/stimulsoft/stimulsoft.designer.js")
+    // ],
+    // stimulsoftBundle: "stimulsoft-bundle.js",
 
     // angular script bundle
     // not minified
@@ -32,7 +37,7 @@ module.exports = {
         bower("/angular-sanitize/angular-sanitize.min.js"),
         bower("/angular-ui-router/release/angular-ui-router.min.js"),
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
-        bower("/angular-ui-select2/src/select2.js"),
+        bower("/angular-ui-select/dist/select.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js")
     ],

@@ -4,7 +4,9 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
+using System.Security.Authentication;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices
 {
@@ -19,8 +21,7 @@ namespace Core.ApplicationServices
 
         public bool IsGlobalAdmin(int userId)
         {
-            var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
             return user.IsGlobalAdmin;
         }
 
@@ -57,35 +58,48 @@ namespace Core.ApplicationServices
             return user != null;
         }
 
-        public bool HasReadAccessOutsideContext(int userId)
+        public bool HasReadAccessOutsideContext(User user)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            AssertUserIsNotNull(user);
+
             if (user.IsGlobalAdmin)
-            {
                 return true;
-            }
 
             // if the user is logged into an organization that allows sharing,
             // then the user have read access outside the context.
             return user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality;
         }
 
+        public bool HasReadAccessOutsideContext(int userId)
+        {
+            var user = _userRepository.GetByKey(userId);
+            AssertUserIsNotNull(user);
+
+            return HasReadAccessOutsideContext(user);
+        }
+
+        public bool HasReadAccess(int userId, Entity entity)
+        {
+            var user = _userRepository.GetByKey(userId);
+            AssertUserIsNotNull(user);
+
+            return HasReadAccess(user, entity);
+        }
+
+
         /// <summary>
         /// Checks if the user have read access to a given instance.
         /// </summary>
-        /// <param name="userId">The user.</param>
+        /// <param name="user">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
-        public bool HasReadAccess(int userId, Entity entity)
+        public bool HasReadAccess(User user, Entity entity)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
-            // check if global admin
+            AssertUserIsNotNull(user);
+
+            // global admin always have access
             if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
                 return true;
-            }
 
             if (entity is IContextAware) // TODO I don't like this impl
             {
@@ -218,6 +232,13 @@ namespace Core.ApplicationServices
 
             // all white-list checks failed, deny access
             return false;
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        private void AssertUserIsNotNull(User user)
+        {
+            if (user == null)
+                throw new AuthenticationException("User is null");
         }
     }
 }

@@ -11,25 +11,22 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    //TODO refactor this mess
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly ILogger _logger;
 
-        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService, ILogger logger)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
-            _logger = logger;
         }
 
         public HttpResponseMessage GetLogin()
         {
-            _logger.Debug("GetLogin called for {user}", KitosUser);
+            Logger.Debug($"GetLogin called for {KitosUser}");
             try
             {
                 var response = CreateLoginResponse(KitosUser);
@@ -38,7 +35,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -46,27 +43,37 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            _logger.Debug("PostLogin called", loginDto);
+            var loginInfo = new { Email = "", Password = "", LoginSuccessful = false };
+
+            if (loginDto != null)
+                loginInfo = new { Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+
             try
             {
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                {
                     throw new ArgumentException();
+                }
 
                 var user = _userRepository.GetByEmail(loginDto.Email);
-
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-
                 var response = CreateLoginResponse(user);
+                loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = true };
+                Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
             }
             catch (ArgumentException)
             {
+                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
+
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                return Error(e);
+                Logger.Info($"Uservalidation: Error. {loginInfo}");
+
+                return LogError(e);
             }
         }
 
@@ -80,7 +87,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -97,7 +104,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 

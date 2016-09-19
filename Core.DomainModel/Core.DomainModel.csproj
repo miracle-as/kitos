@@ -62,6 +62,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -74,6 +75,7 @@
   <ItemGroup>
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItProject\Assignment.cs" />
+    <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
@@ -158,6 +160,9 @@
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Organization\TaskUsage.cs" />
+    <Compile Include="Reports\IReportModule.cs" />
+    <Compile Include="Reports\Report.cs" />
+    <Compile Include="Reports\ReportCategoryType.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
@@ -166,12 +171,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" />
+  <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

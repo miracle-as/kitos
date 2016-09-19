@@ -364,28 +364,6 @@
                             }
                         }
                     },
-                    //{
-                    //    field: "AssociatedSystemUsages", title: "IT System", width: 150,
-                    //    persistId: "itsys", // DON'T YOU DARE RENAME!
-                    //    template: dataItem => {
-                    //        var value = "";
-                    //        if (dataItem.AssociatedSystemUsages.length > 0)
-                    //            value += this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
-
-                    //        if (dataItem.AssociatedSystemUsages.length > 1) {
-                    //            value += ` (${dataItem.AssociatedSystemUsages.length})`;
-                    //        }
-
-                    //        return value;
-                    //    },
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
                     {
                         field: "Supplier.Name", title: "Leverandør", width: 200,
                         persistId: "suppliername", // DON'T YOU DARE RENAME!
@@ -629,7 +607,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add special contract signer role
             var signerRole = {

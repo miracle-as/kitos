@@ -39,6 +39,8 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PublishDatabases>false</PublishDatabases>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -86,6 +88,10 @@
       <HintPath>..\packages\Microsoft.OData.Edm.6.15.0\lib\portable-net45+win+wpa81\Microsoft.OData.Edm.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Spatial, Version=6.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Spatial.6.15.0\lib\portable-net45+win+wpa81\Microsoft.Spatial.dll</HintPath>
       <Private>True</Private>
@@ -126,6 +132,10 @@
       <HintPath>..\packages\Ninject.Web.WebApi.WebHost.3.2.4.0\lib\net45-full\Ninject.Web.WebApi.WebHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
       <Private>True</Private>
@@ -142,9 +152,8 @@
       <HintPath>..\packages\Serilog.Sinks.Elasticsearch.3.0.134\lib\net45\Serilog.Sinks.Elasticsearch.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SerilogWeb.Classic, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9462ddd55fbc0e7f, processorArchitecture=MSIL">
-      <HintPath>..\packages\SerilogWeb.Classic.2.0.9\lib\net45\SerilogWeb.Classic.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="SerilogWeb.Classic">
+      <HintPath>externalreferences\SerilogWeb.Classic.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -154,6 +163,10 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -165,6 +178,10 @@
     </Reference>
     <Reference Include="System.Web.Http">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.3\lib\net45\System.Web.Http.Cors.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
@@ -253,11 +270,11 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
-    <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\InterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
-    <Compile Include="Controllers\OData\ItInterfaceUsesController.cs" />
+    <Compile Include="Controllers\OData\ItInterfaceUsesEntityController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\ItContractRolesController.cs" />
@@ -272,12 +289,16 @@
     <Compile Include="Controllers\OData\ItProjectsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\ReportCategoriesController.cs" />
+    <Compile Include="Controllers\OData\ReportsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
-    <Compile Include="Controllers\OData\UsersController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
+    <Compile Include="Controllers\OData\UsersController.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
@@ -423,15 +444,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
-    <Content Include="app\components\reports\reports-overview.html" />
-    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
+	<TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+	<TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-role.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-role.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-role.ts" />
@@ -440,6 +461,11 @@
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
+	<TypeScriptCompile Include="appReport\index.d.ts" />
+    <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
+    <TypeScriptCompile Include="appReport\reportApp.module.ts" />
+    <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
+    <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
@@ -447,11 +473,21 @@
     <TypeScriptCompile Include="app\shared\disabledOnBusy.directive.ts" />
     <TypeScriptCompile Include="app\components\global-config\globalOptionList\globalOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\global-config\globalOptionRoleList\globalOptionRoleList.directive.ts" />
-    <Content Include="app\shared\filters\joinBy.filter.js" />
+    <TypeScriptCompile Include="app\services\userServices.ts" />
+    <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
+    <Content Include="appReport\css\report.css" />
+    <Content Include="appReport\css\stimulsoft.designer.office2013.white.blue.css" />
+    <Content Include="appReport\css\stimulsoft.viewer.office2013.css" />
+    <Content Include="appReport\Index.html" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
+    <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
+    <Content Include="app\components\reports\reports-overview.html" />
     <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
@@ -474,7 +510,7 @@
     <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueOrgUser.directive.ts" />
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
-    <Content Include="app\utility\lodash.mixin.js" />
+    <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
@@ -483,6 +519,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\kitos.css" />
+    <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
@@ -611,11 +648,14 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-module-admin.ts" />
+    <TypeScriptCompile Include="app\components\reports\report-edit.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\index.d.ts" />
     <TypeScriptCompile Include="app\directiveFactory.ts" />
     <TypeScriptCompile Include="app\models\api\organization-role.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
@@ -703,6 +743,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
     <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
+    <TypeScriptCompile Include="app\models\report\report.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
@@ -710,27 +751,10 @@
     <TypeScriptCompile Include="app\models\user.ts" />
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
+    <TypeScriptCompile Include="app\services\ReportService.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-component-router.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2016.1.112\kendo.web.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\lodash\lodash-3.10.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\selenium-webdriver\selenium-webdriver.d.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\it-system-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-kle.e2e.spec.ts" />
@@ -777,9 +801,6 @@
     <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\JSONfn\jsonfn.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-create.controller.ts" />
@@ -853,8 +874,8 @@
     <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
-    <Content Include="app\shared\limitToDots.filter.js" />
-    <TypeScriptCompile Include="app\services\userServices.ts" />
+    <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />
+	<TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
     <TypeScriptCompile Include="app\services\httpBusyInterceptor.ts" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
@@ -879,14 +900,14 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="tsconfig.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1085,7 +1106,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
+	   Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
@@ -1099,7 +1120,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props'))" />
-    <Error Condition="!Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets'))" />
   </Target>
-  <Import Project="..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets')" />
+  <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
 </Project>

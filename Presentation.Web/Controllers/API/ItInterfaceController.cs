@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -229,6 +229,7 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
                 item.ItInterfaceId = item.ItInterfaceId ?? "";
+                item.Uuid = Guid.NewGuid();
 
                 foreach (var dataRow in item.DataRows)
                 {
@@ -242,7 +243,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -269,7 +270,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -281,7 +282,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 

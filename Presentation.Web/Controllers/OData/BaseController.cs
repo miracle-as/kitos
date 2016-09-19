@@ -21,7 +21,6 @@ namespace Presentation.Web.Controllers.OData
             {
                 int userId;
                 int.TryParse(User.Identity.Name, out userId);
-
                 return userId;
             }
         }

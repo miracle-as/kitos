@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItContract;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel
 {
@@ -27,6 +29,8 @@ namespace Core.DomainModel
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
             this.SignerForContracts = new Collection<ItContract.ItContract>();
+            LockedOutDate = null;
+            FailedAttempts = 0;
         }
 
         public string Name { get; set; }
@@ -35,7 +39,6 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
@@ -109,13 +112,31 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
+        public DateTime? LockedOutDate { get; set; }
+
+        public int FailedAttempts { get; set; }
+
+        #region Authentication
+
+        public bool IsGlobalAdmin { get; set; }
+
         public override bool HasUserWriteAccess(User user)
         {
-            if (Id == user.Id)
-                return true;
-
-            return base.HasUserWriteAccess(user);
+            return Id == user.Id || base.HasUserWriteAccess(user);
         }
+
+        public bool IsLocalAdmin
+        {
+            get
+            {
+                return OrganizationRights.Any(
+                    right => right.Role == OrganizationRole.LocalAdmin &&
+                             right.OrganizationId == DefaultOrganizationId.GetValueOrDefault());
+            }
+        }
+
+        #endregion
+
 
         public override string ToString()
         {

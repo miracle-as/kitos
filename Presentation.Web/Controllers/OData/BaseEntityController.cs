@@ -18,6 +18,49 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
+        [EnableQuery]
+        public virtual IHttpActionResult Get()
+        {
+            if (CurentUser == null)
+                return Unauthorized();
+
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+
+            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser) || hasOrg == false)
+                return Ok(Repository.AsQueryable());
+
+            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == CurrentOrganizationId));
+        }
+
+        [EnableQuery(MaxExpansionDepth = 4)]
+        public virtual IHttpActionResult Get(int key)
+        {
+            IQueryable<T> result = Repository.AsQueryable().Where(p => p.Id == key);
+
+            if (!result.Any())
+                return NotFound();
+
+            var entity = result.First();
+            if (!AuthenticationService.HasReadAccess(UserId, entity))
+                return Unauthorized();
+
+            return Ok(SingleResult.Create(result));
+        }
+
+        [EnableQuery(MaxExpansionDepth = 5)]
+        public IHttpActionResult GetByOrganizationKey(int key)
+        {
+            if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
+                throw new InvalidCastException("Entity must implement IHasOrganization");
+
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+
+            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
+            return Ok(result);
+        }
+
         public IHttpActionResult Put(int key, T entity)
         {
             return StatusCode(HttpStatusCode.NotImplemented);
@@ -31,6 +74,14 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                entity.ObjectOwnerId = UserId;
+                entity.LastChangedByUserId = UserId;
+                var entityWithOrganization = entity as IHasOrganization;
+                if (entityWithOrganization != null && CurentUser.DefaultOrganizationId.HasValue)
+                {
+                    entityWithOrganization.OrganizationId = CurentUser.DefaultOrganizationId.Value;
+                    entityWithOrganization.Organization = CurentUser.DefaultOrganization;
+                }
                 entity = Repository.Insert(entity);
                 Repository.Save();
             }
@@ -75,24 +126,26 @@ namespace Presentation.Web.Controllers.OData
             return Updated(entity);
         }
 
-        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
-        //protected IHttpActionResult Delete(int key)
-        //{
-        //    var entity = Repository.GetByKey(key);
-        //    if (entity == null)
-        //        return NotFound();
+        public IHttpActionResult Delete(int key)
+        {
+            var entity = Repository.GetByKey(key);
+            if (entity == null)
+                return NotFound();
 
-        //    try
-        //    {
-        //        Repository.DeleteByKey(key);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
+            if (!_authService.HasWriteAccess(UserId, entity))
+                return Unauthorized();
 
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
+            try
+            {
+                Repository.DeleteByKey(key);
+                Repository.Save();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
     }
 }

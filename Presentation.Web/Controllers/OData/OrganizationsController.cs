@@ -7,7 +7,7 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationsController : BaseController<Organization>
+    public class OrganizationsController : BaseEntityController<Organization>
     {
         private readonly IOrganizationService _organizationService;
 
@@ -51,6 +51,46 @@ namespace Presentation.Web.Controllers.OData
             //_organizationService.RemoveUser(orgKey, userId); TODO
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/LastChangedByUser")]
+        public virtual IHttpActionResult GetLastChangedByUser(int orgKey)
+        {
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+
+            var result = Repository.GetByKey(orgKey).LastChangedByUser;
+            return Ok(result);
+        }
+
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/ObjectOwner")]
+        public virtual IHttpActionResult GetObjectOwner(int orgKey)
+        {
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
+            {
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            }
+
+            var result = Repository.GetByKey(orgKey).ObjectOwner;
+            return Ok(result);
+        }
+
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/Type")]
+        public virtual IHttpActionResult GetType(int orgKey)
+        {
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
+            {
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            }
+
+            var result = Repository.GetByKey(orgKey).Type;
+            return Ok(result);
         }
     }
 }

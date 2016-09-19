@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
 var source = "Presentation.Web",
     sourceApp = source + "/app",
     sourceScript = source + "/Scripts",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.js"],
-    allJavaScriptNoTests = [sourceApp + "/**/!(*.spec|*.po).js"],
+    allJavaScriptNoTests = sourceApp + "/**/!(*.spec|*.po).js",
     allTypeScript = [sourceApp + "/**/*.ts"],
     bowerComponents = "bower_components",
+    appMaps = sourceApp + "/**/*.js.map",
 
     // dependency files of files to unit test
     unitDependencies = [
         "bower_components/lodash/lodash.js",
         "bower_components/jquery/dist/jquery.js",
-        "bower_components/select2/select2.js",
         "bower_components/moment/moment.js",
         "bower_components/jsonfn-bower/jsonfn.js",
         "bower_components/angular/angular.js",
@@ -23,7 +23,7 @@ var source = "Presentation.Web",
         "bower_components/angular-ui-router/release/angular-ui-router.js",
         "bower_components/angular-bootstrap/ui-bootstrap.js",
         "bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-        "bower_components/angular-ui-select2/src/select2.js"
+        "bower_components//angular-ui-select/dist/select.js"        
     ],
 
     // unit
@@ -57,6 +57,7 @@ var source = "Presentation.Web",
 module.exports = {
     source: source,
     sourceApp: sourceApp,
+    appMaps: appMaps,
     sourceScript: sourceScript,
     allJavaScript: allJavaScript,
     allTypeScript: allTypeScript,

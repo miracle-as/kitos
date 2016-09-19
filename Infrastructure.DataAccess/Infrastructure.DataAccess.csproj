@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -110,6 +112,7 @@
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitUsageMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
+    <Compile Include="Mapping\ReportMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
@@ -170,6 +173,14 @@
     <Compile Include="Migrations\201607271054106_AddedDefaultOrgToUser.Designer.cs">
       <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608111143069_AddedReports.cs" />
+    <Compile Include="Migrations\201608111143069_AddedReports.Designer.cs">
+      <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.cs" />
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.Designer.cs">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -209,8 +220,21 @@
     <EmbeddedResource Include="Migrations\201607271054106_AddedDefaultOrgToUser.resx">
       <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608111143069_AddedReports.resx">
+      <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.resx">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

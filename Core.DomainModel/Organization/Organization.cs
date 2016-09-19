@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.Reports;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.Organization
 {
@@ -13,14 +15,15 @@ namespace Core.DomainModel.Organization
     {
         public Organization()
         {
-            this.ItProjects = new List<ItProject.ItProject>();
-            this.ItSystems = new List<ItSystem.ItSystem>();
-            this.Supplier = new List<ItContract.ItContract>();
-            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
-            this.ItContracts = new List<ItContract.ItContract>();
-            this.OrgUnits = new List<OrganizationUnit>();
-            this.Rights = new List<OrganizationRight>();
-            this.DefaultOrganizationForUsers = new List<User>();
+            ItProjects = new List<ItProject.ItProject>();
+            ItSystems = new List<ItSystem.ItSystem>();
+            Supplier = new List<ItContract.ItContract>();
+            ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
+            ItContracts = new List<ItContract.ItContract>();
+            OrgUnits = new List<OrganizationUnit>();
+            Rights = new List<OrganizationRight>();
+            DefaultOrganizationForUsers = new List<User>();
+            Reports = new List<Report>();
         }
 
         public string Name { get; set; }
@@ -73,6 +76,8 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<OrganizationRight> Rights { get; set; }
 
         public virtual ICollection<User> DefaultOrganizationForUsers { get; set; }
+
+        public virtual ICollection<Report> Reports { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

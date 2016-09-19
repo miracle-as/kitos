@@ -94,6 +94,19 @@ namespace Presentation.Web.Controllers.OData
                 return Ok(true);
         }
 
+        //GET /Organizations(1)/DefaultOrganizationForUsers
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
+        public IHttpActionResult GetDefaultOrganizationForUsers(int orgKey)
+        {
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden, this);
+
+            var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
+            return Ok(result);
+        }
+
         private bool EmailExists(string email)
         {
             var matchingEmails = Repository.Get(x => x.Email == email);

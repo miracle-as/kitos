@@ -2,7 +2,7 @@
     'use strict';
 
     app.directive('datereader', ['moment',
-        function(moment) {
+        function (moment) {
             return {
                 scope: true,
                 template: '<span>{{dateStr}}</span>',

@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
@@ -8,7 +10,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItInterfacesController : BaseController<ItInterface>
+    public class ItInterfacesController : BaseEntityController<ItInterface>
     {
         public ItInterfacesController(IGenericRepository<ItInterface> repository)
             : base(repository)
@@ -29,6 +31,21 @@ namespace Presentation.Web.Controllers.OData
         {
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
             return Ok(result);
+        }
+
+        // GET /Organizations(1)/ItInterfaces(1)
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/ItInterfaces({interfaceKey})")]
+        public IHttpActionResult GetItInterfaces(int orgKey, int interfaceKey)
+        {
+            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == interfaceKey);
+            if (entity == null)
+                return NotFound();
+
+            if (AuthenticationService.HasReadAccess(UserId, entity))
+                return Ok(entity);
+
+            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
         }
     }
 }
