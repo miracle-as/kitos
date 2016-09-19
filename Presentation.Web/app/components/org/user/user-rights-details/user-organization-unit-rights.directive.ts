@@ -13,7 +13,7 @@
     }
 
     class UserOrganizationUnitRights implements ng.IDirective {
-        public templateUrl = "app/components/org/user/user-rights.view.html";
+        public templateUrl = "app/components/org/user/user-rights-details/user-rights.view.html";
         public scope = {
             userId: "@",
             currentOrganizationId: "@"
@@ -27,7 +27,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: () => `/odata/Users(${scope.userId})/OrganizationUnitRights?$filter=Object/OrganizationId eq ${scope.currentOrganizationId}&$expand=Object($select=Name),Role($select=Name)`,
+                            url: () => `/odata/Users(${scope.userId})/OrganizationUnitRights?$filter=Object/OrganizationId eq ${scope.currentOrganizationId}&$expand=Object($select=Name),Role($select=Name,HasWriteAccess)`,
                             dataType: "json"
                         },
                     },
@@ -64,6 +64,19 @@
                         persistId: "orgunitrole", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Role.Name,
                         excelTemplate: (dataItem) => dataItem.Role.Name,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Role.HasWriteAccess", title: "Skrive", width: 150,
+                        persistId: "orgunitroleaccess", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Role.HasWriteAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
                         hidden: false,
                         filterable: {
                             cell: {

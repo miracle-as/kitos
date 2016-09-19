@@ -11,10 +11,10 @@
                 currentOrganizationId: "@",
                 ngDisabled: "="
             },
-            template: `<button type="button" data-ng-if="ctrl.user.LastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="ctrl.sendAdvis(ctrl.user, false)" data-ng-disabled="ctrl.ngDisabled">
+            template: `<button type="button" data-ng-if="ctrl.user.LastAdvisDate === null" class="btn btn-success btn-xs" style="width: 90%" data-ng-click="ctrl.sendAdvis(ctrl.user, false)" data-ng-disabled="ctrl.ngDisabled">
                     Send Advis
                 </button>
-                <button type="button" data-ng-if="ctrl.user.LastAdvisDate !== null" class="btn btn-warning btn-xs btn-block" data-ng-click="ctrl.sendAdvis(ctrl.user, true)" data-ng-disabled="ctrl.ngDisabled">
+                <button type="button" data-ng-if="ctrl.user.LastAdvisDate !== null" class="btn btn-warning btn-xs" style="width: 90%" data-ng-click="ctrl.sendAdvis(ctrl.user, true)" data-ng-disabled="ctrl.ngDisabled">
                     {{ ctrl.user.LastAdvisDate | date:'dd-MM-yy' }}
                 </button>`
         };

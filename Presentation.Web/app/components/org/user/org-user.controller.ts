@@ -1,30 +1,27 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IControllerScope extends ng.IScope {
-
-    }
-
     interface IGridModel extends Models.IUser {
         canEdit: boolean;
+        isLocalAdmin: boolean;
+        isOrgAdmin: boolean;
+        isProjectAdmin: boolean;
+        isSystemAdmin: boolean;
+        isContractAdmin: boolean;
     }
 
     class OrganizationUserController {
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$scope", "$http", "$timeout", "_", "$", "$state", "$uibModal", "$q", "$stateParams", "notify", "user"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "user"];
 
         constructor(
-            private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private $uibModal: ng.ui.bootstrap.IModalService,
-            private $q: ng.IQService,
-            private $stateParams: ng.ui.IStateParamsService,
             private notify,
             private user) {
             this.mainGridOptions = {
@@ -97,6 +94,12 @@
 
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
+
+                                usr.isLocalAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.LocalAdmin) !== undefined;
+                                usr.isOrgAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.OrganizationModuleAdmin) !== undefined;
+                                usr.isProjectAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ProjectModuleAdmin) !== undefined;
+                                usr.isSystemAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.SystemModuleAdmin) !== undefined;
+                                usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                             });
                             return response;
                         }
@@ -134,15 +137,10 @@
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                 </uib-tabset>`,
-                //dataBound: this.saveGridOptions,
-                //columnResize: this.saveGridOptions,
-                //columnHide: this.saveGridOptions,
-                //columnShow: this.saveGridOptions,
-                //columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 150,
+                        field: "Name", title: "Navn", width: 230,
                         persistId: "fullname", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
@@ -156,7 +154,7 @@
                         }
                     },
                     {
-                        field: "Email", title: "Email", width: 150,
+                        field: "Email", title: "Email", width: 230,
                         persistId: "email", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Email,
                         excelTemplate: (dataItem) => dataItem.Email,
@@ -170,7 +168,7 @@
                         }
                     },
                     {
-                        field: "LastAdvisDate", title: "Advis", width: 150,
+                        field: "LastAdvisDate", title: "Advis", width: 110,
                         persistId: "advisdate", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
                         excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
@@ -198,12 +196,12 @@
                         }
                     },
                     {
-                        field: "OrganizationRights.Role", title: "Rolle", width: 150,
+                        field: "OrganizationRights.Role", title: "Roller", width: 150,
                         persistId: "role", // DON'T YOU DARE RENAME!
                         attributes: { "class": "might-overflow" },
                         template: this.roleTemplate,
                         excelTemplate: this.roleTemplate,
-                        hidden: false,
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -213,11 +211,56 @@
                         }
                     },
                     {
+                        field: "isLocalAdmin", title: "Lokal Admin", width: 96,
+                        persistId: "localadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isLocalAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "isOrgAdmin", title: "Organisations Admin", width: 104,
+                        persistId: "orgadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isOrgAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "isProjectAdmin", title: "Projekt Admin", width: 109,
+                        persistId: "projectadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isProjectAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "isSystemAdmin", title: "System Admin", width: 104,
+                        persistId: "systemadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isSystemAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
+                        persistId: "contractadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isContractAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
                         command: [
                             { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                             { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                         ],
-                        title: " ", width: "150px",
+                        title: " ", width: 176,
                         persistId: "command"
                     }
                 ]
@@ -325,271 +368,6 @@
 
             return template;
         }
-
-        //private isLocalAdmin(selectedUser) {
-        //    var uId = selectedUser.id;
-        //    var oId = this.user.currentOrganizationId;
-
-        //    return this.$http.get("api/OrganizationRight/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
-        //        return result.response;
-        //    }).error(function (error) {
-        //        this.notify.addErrorMessage("Fejl. Noget gik galt!");
-        //    });
-        //}
-
-        //private loadUsers() {
-        //    var deferred = this.$q.defer();
-
-        //    var url = 'api/user?overview';
-        //    url += '&orgId=' + this.user.currentOrganizationId;
-        //    url += '&skip=' + this.pagination.skip;
-        //    url += '&take=' + this.pagination.take;
-
-        //    if (this.pagination.orderBy) {
-        //        url += '&orderBy=' + this.pagination.orderBy;
-        //        if (this.pagination.descending) url += '&descending=' + this.pagination.descending;
-        //    }
-
-        //    if (this.pagination.search)
-        //        url += '&q=' + this.pagination.search;
-        //    else
-        //        url += "&q=";
-
-        //    this.users = [];
-        //    this.$http.get(url).success(function (result, status, headers) {
-
-        //        var paginationHeader = JSON.parse(headers('X-Pagination'));
-        //        this.totalCount = paginationHeader.TotalCount;
-
-        //        this.users = result.response;
-        //        deferred.resolve();
-        //    }).error(function () {
-        //        this.notify.addErrorMessage("Kunne ikke hente brugere!");
-        //        deferred.reject();
-        //    });
-
-        //    return deferred.promise;
-        //}
-
-        ////Goes through a collection of users, and for each user sets canBeEdited flag
-        ////Returns a flattened promise, that resolves when all users in the collection has been resolved
-        //private setCanEdit(userCollection) {
-        //    return this.$q.all(_.map(userCollection, function (iteratee: { adminRights; canBeEdited; id; }) {
-        //        var deferred = this.$q.defer();
-
-        //        iteratee.adminRights = _.findWhere(iteratee.adminRights, { roleName: "Medarbejder", organizationId: this.user.currentOrganizationId });
-
-        //        setTimeout(function () {
-        //            this.$http.get("api/user/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + this.user.currentOrganizationId)
-        //                .success(function (result) {
-        //                    iteratee.canBeEdited = result.response;
-        //                    deferred.resolve(iteratee);
-        //                })
-        //                .error(function (result) {
-        //                    iteratee.canBeEdited = false;
-        //                    deferred.reject(result);
-        //                }
-        //                );
-        //        }, 0);
-
-        //        return deferred.promise;
-        //    }));
-        //}
-
-        //private updateUser(userToUpdate, successmessage, showNotify) {
-
-        //    var deferred = this.$q.defer();
-
-        //    setTimeout(function () {
-        //        if (showNotify)
-        //            deferred.notify('Ændrer...');
-        //        this.$http({ method: 'PATCH', url: "api/user/" + userToUpdate.id + "?organizationId=" + this.user.currentOrganizationId, data: userToUpdate, handleBusy: true })
-        //            .success(function (result) {
-        //                deferred.resolve(successmessage);
-        //            })
-        //            .error(function (result, status) {
-        //                if (status === 409) {
-        //                    deferred.reject("Fejl! Kan ikke ændre Email for " + userToUpdate.fullName + " da den allerede findes!");
-        //                    this.reload();
-        //                } else {
-        //                    deferred.reject("Fejl! " + userToUpdate.fullName + " kunne ikke ændres!");
-        //                }
-        //            });
-        //    }, 0);
-
-        //    return deferred.promise;
-        //}
-
-        //private deleteOrgRoleAction(u) {
-        //    var uId = u.id;
-
-        //    var msg = this.notify.addInfoMessage("Arbejder ...", false);
-
-        //    this.$http.delete("api/OrganizationRight/?orgId=" + this.user.currentOrganizationId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
-        //        msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
-        //        this.reload();
-        //    }).error(function (deleteResult) {
-        //        msg.toErrorMessage("Kunne ikke fjerne " + u.name + " " + u.lastName + " fra organisationen");
-        //    });
-        //}
-
-        //private reload() {
-        //    this.$state.go('.', { lastModule: this.chosenModule }, { reload: true });
-        //}
-
-        //public toggleStatus(userToToggle) {
-        //    userToToggle.isLocked = !userToToggle.isLocked;
-        //    var success = userToToggle.isLocked ? userToToggle.name + " er låst" : userToToggle.name + " er låst op";
-        //    this.updateUser(userToToggle, success, null).then( //success
-        //        function (successMessage) {
-        //            this.notify.addSuccessMessage(successMessage);
-        //        },
-        //        //failure
-        //        function (errorMessage) {
-        //            this.notify.addErrorMessage(errorMessage);
-        //        },
-        //        //update
-        //        function (updateMessage) {
-        //            this.notify.addInfoMessage(updateMessage);
-        //        });
-        //}
-
-        ////remove a users organizationRole - thereby removing their readaccess for this organization
-        //public deleteOrgRole(u) {
-        //    this.isLocalAdmin(u).then(function (response) {
-        //        if (response.data.response === true) {
-        //            var confirmBox = confirm(u.name + " " + u.lastName + " er også lokaladministrator!\n\nVil du fortsat fjerne tilknytning?");
-        //            if (confirmBox) {
-        //                this.deleteOrgRoleAction(u);
-        //            } else {
-        //                this.notify.addInfoMessage("Handling afbrudt!");
-        //            }
-        //        } else {
-        //            this.deleteOrgRoleAction(u);
-        //        }
-        //    });
-        //};
-
-        //public getRightsForModule = function (chosenModule) {
-        //    //return a flat promise, that fullfills when all rights have been retrieved
-        //    return this.$q.all(_.map(this.users, function (iteratee: { id; rights; }) {
-        //        var deferred = this.$q.defer();
-
-        //        setTimeout(function () {
-        //            var httpUrl = 'api/';
-
-        //            switch (chosenModule) {
-        //                //Choose Modul selected
-        //                case '0':
-        //                    iteratee.rights = '';
-        //                    return deferred.resolve();
-        //                //Organisation selected
-        //                case '1':
-        //                    httpUrl += 'organizationunitright?orgId=' + this.user.currentOrganizationId;
-        //                    break;
-        //                //ITProjects selected
-        //                case '2':
-        //                    httpUrl += 'itprojectright?';
-        //                    break;
-        //                //ITSystems selected
-        //                case '3':
-        //                    httpUrl += 'itSystemUsageRights?';
-        //                    break;
-        //                //ITContracts selected
-        //                case '4':
-        //                    httpUrl += 'itcontractrights?';
-        //                    break;
-        //            }
-
-        //            httpUrl += '&userId=' + iteratee.id;
-        //            return this.$http.get(httpUrl, { handleBusy: true })
-        //                .success(function (result) {
-        //                    iteratee.rights = result.response;
-        //                    deferred.resolve();
-        //                })
-        //                .error(function (result) {
-        //                    deferred.reject();
-        //                });
-        //        }, 0);
-
-        //        return deferred.promise;
-        //    }));
-        //}
-
-        //public editUser = function (userToEdit) {
-        //    var modal = this.$uibModal.open({
-        //        // fade in instead of slide from top, fixes strange cursor placement in IE
-        //        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-        //        windowClass: 'modal fade in',
-        //        templateUrl: 'app/components/org/user/org-user-modal-edit.view.html',
-        //        controller: [
-        //            '$scope', '$uibModalInstance', 'notify', 'autofocus', function ($modalScope, $modalInstance, modalnotify, autofocus) {
-        //                autofocus();
-        //                $modalScope.busy = false;
-        //                $modalScope.name = userToEdit.name;
-        //                $modalScope.email = userToEdit.email;
-        //                $modalScope.repeatEmail = userToEdit.email;
-        //                $modalScope.lastName = userToEdit.lastName;
-        //                $modalScope.phoneNumber = userToEdit.phoneNumber;
-        //                $modalScope.ok = function () {
-        //                    $modalScope.busy = true;
-        //                    userToEdit.name = $modalScope.name;
-        //                    userToEdit.email = $modalScope.email;
-        //                    userToEdit.lastName = $modalScope.lastName;
-        //                    userToEdit.phoneNumber = $modalScope.phoneNumber;
-        //                    var msg = this.notify.addInfoMessage("Ændrer");
-        //                    this.updateUser(userToEdit, userToEdit.name + " er ændret.", true).then(
-        //                        //success
-        //                        function (successMessage) {
-        //                            msg.toSuccessMessage(successMessage);
-        //                            $modalInstance.close();
-        //                            this.reload();
-        //                        },
-        //                        //failure
-        //                        function (errorMessage) {
-        //                            msg.toErrorMessage(errorMessage);
-        //                            $modalInstance.close();
-        //                        },
-        //                        //update
-        //                        function (updateMessage) {
-        //                            msg.toInfoMessage(updateMessage);
-        //                        });
-        //                };
-        //                $modalScope.cancel = function () {
-        //                    $modalInstance.close();
-        //                };
-        //            }
-        //        ]
-        //    });
-
-        //    modal.result.then(function () { });
-        //}
-
-        //public sendAdvis = function (userToAdvis, reminder) {
-        //    var params: { sendReminder; sendAdvis; organizationId; } = { sendReminder: null, sendAdvis: null, organizationId: null };
-        //    var type;
-
-        //    if (reminder) {
-        //        params.sendReminder = true;
-        //        type = "påmindelse";
-
-        //    } else {
-        //        params.sendAdvis = true;
-        //        type = "advis";
-        //    }
-        //    params.organizationId = this.user.currentOrganizationId;
-
-        //    var msg = this.notify.addInfoMessage("Sender " + type + " til " + userToAdvis.email, false);
-        //    this.$http.post("api/user", userToAdvis, { handleBusy: true, params: params })
-        //        .success(function (result) {
-        //            userToAdvis.lastAdvisDate = result.response.lastAdvisDate;
-        //            msg.toSuccessMessage("Advis sendt til " + userToAdvis.email);
-        //        })
-        //        .error(function (result) {
-        //            msg.toErrorMessage("Kunne ikke sende " + type + "!");
-        //        })
-        //        .then(function () { });
-        //}
     }
 
     angular

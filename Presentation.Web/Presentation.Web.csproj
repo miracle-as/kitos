@@ -425,12 +425,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app\components\org\user\user-rights.view.html" />
+    <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <Content Include="app\components\reports\reports-overview.html" />
-    <TypeScriptCompile Include="app\components\org\user\user-organization-unit-rights.directive.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-contract-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-system-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-role.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-role.ts" />
@@ -611,7 +611,7 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-project-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
