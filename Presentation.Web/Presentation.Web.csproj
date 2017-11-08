@@ -435,6 +435,7 @@
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
+    <Compile Include="Models\TokenDto.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />

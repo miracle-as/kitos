@@ -46,6 +46,10 @@
         public setLocalizationFile(path:string) {
             this.$window.Stimulsoft.Base.Localization.StiLocalization.setLocalizationFile(path);
         }
+
+        public setKey(key: string) {
+            this.$window.Stimulsoft.Base.StiLicense.key = key;
+        }
     }
 
     angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -180,6 +179,18 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [HttpPost]
+        [Route("api/authorize/GetToken")]
+        public TokenDto GetToken()
+        {
+            var token = new TokenDto
+            {
+                access_token = "RsT5OjbzRn430zqMLgV3Ia",
+                expires_in = 3600
+            };
+            return token;
         }
 
         // helper function

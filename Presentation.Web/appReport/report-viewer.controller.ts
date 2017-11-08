@@ -35,6 +35,14 @@ module Kitos.Reports {
                         // 02/11 MEMA: The translation is far from done. Add back, when translated.
                         //stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
 
+                        stimulsoftService.setKey("6vJhGtLLLz2GNviWmUTrhSqnOItdDwjBylQzQcAOiHkdf+M2tN29K5oDkeIUnpUPgtZSvScjXmSwTPB57ZxmLP59EQ" +
+                            "EmxMCtVAUmznuiMrs/aESWbqyJI+0957evRT0kNvq6IOVFnEilK2cCVKuRZZ1rVefpvDkzmHDZPLUf6Yaxrh5iJps7" +
+                            "UfuxeCuhr6yIWgrz5jFvdWvkIjnTXKKDQ6xUg5/zpOaC5Xy3AcOC0TaeOTQqGtgR/HNNSDuAjrPIrQyMCD/QCFoG3r" +
+                            "S3DXcAaaZq78a8C+YCN4NHPLTHmLWVTyrgiOU4PIXvo8yQ1vLYezpLxyDkvScNFnJf4wmgwtSRnbebI5UAc/766sKY" +
+                            "IfzH6WXHo9StXQKR+iuiX8OSpQ6vWH0mJ08QG0gRFLZ6Pd5vF12Mtk0T9s5U8Rt00k5ZsF2aEN8U/NCrw3U4Y7way7" +
+                            "4WAB7uSrulVCyjdHB5Kdm6Nfid02/y+Qwf8QX4nRg0s83S9dCcA5EC0UKaZKHtVuVFDsoWYa1UnNhhYOWx1FW3QmMk" + 
+                            "iNYu9KP5Gw3YK9Z7tLvRI/BLosV74iVA8Hws");
+
                         this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
                         // Add the design button event
@@ -110,12 +118,13 @@ module Kitos.Reports {
 
                     var addKitos = true;
                     var i;
-                    //console.log("DB's: " + this.stiReport.dictionary.databases.count);
+                    var conString = window.location.origin + "/odata"; //+";AddressBearer=" + window.location.origin + "/api/authorize/gettoken";
+
+                    
                     for (i = 0; i < this.stiReport.dictionary.databases.count; i++) {
-                        //console.log("DB name: " + this.stiReport.dictionary.databases.getByIndex(i).name);
                         if (this.stiReport.dictionary.databases.getByIndex(i).name === "Kitos") {
                             addKitos = false;
-                            this.stiReport.dictionary.databases.getByIndex(i).connectionString = window.location.origin + "/odata";
+                            this.stiReport.dictionary.databases.getByIndex(i).connectionString = conString
                         }
                     }
 
@@ -123,7 +132,7 @@ module Kitos.Reports {
                         var odata = this.stimulsoftService.getODataDatabase();
                         odata.name = "Kitos";
                         odata.alias = "Kitos";
-                        odata.connectionString = window.location.origin + "/odata";
+                        odata.connectionString = conString
                         this.stiReport.dictionary.databases.add(odata);
                         this.stiReport.dictionary.synchronize();
                     }
