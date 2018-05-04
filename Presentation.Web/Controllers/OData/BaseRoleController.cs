@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
                 if (t.ToLower() == "priority")
                 {
                     //var testPriorFromDelta = 1;
-                    var initDelta = delta.GetEntity();
+                    var initDelta = delta.GetInstance();
                     var entity = _repository.GetByKey(key);
 
                     if (entity.priority != 0)

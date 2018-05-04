@@ -43,8 +43,8 @@
     }
 
     export interface ICreateUserPayload {
-        user: ICreateUser;
-        organizationId: number;
-        sendMailOnCreation?: boolean;
+        User: ICreateUser;
+        OrganizationId: number;
+        SendMailOnCreation?: boolean;
     }
 }

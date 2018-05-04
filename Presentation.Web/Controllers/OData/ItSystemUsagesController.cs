@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        [ODataRoute("Organizations({key})/ItSystemUsages")]
+        //[ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.OData
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
         [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
+        //[ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

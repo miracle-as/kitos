@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/Rights
         [EnableQuery]
-        [ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
+        //[ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
         public IHttpActionResult GetByItContract(int orgId, int contractId)
         {
             // TODO figure out how to check auth
@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Users(1)/ItContractRights
         [EnableQuery]
-        [ODataRoute("Users({userId})/ItContractRights")]
+        //[ODataRoute("Users({userId})/ItContractRights")]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth

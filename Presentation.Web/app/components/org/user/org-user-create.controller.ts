@@ -62,19 +62,19 @@
         public create(sendMail: boolean) {
             this.busy = true;
             var userPayload: Models.ICreateUserPayload = {
-                user: {
+                User: {
                     Name: this.vm.name,
                     LastName: this.vm.lastName,
                     Email: this.vm.email,
                     PhoneNumber: this.vm.phoneNumber
                 },
-                organizationId: this.user.currentOrganizationId,
-                sendMailOnCreation: sendMail
+                OrganizationId: this.user.currentOrganizationId,
+                SendMailOnCreation: sendMail
             };
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<Models.IUser>("odata/Users/Create", userPayload, { handleBusy: true })
+            this.$http.post<Models.IUser>("odata/Users/UserService.Create", userPayload, { handleBusy: true })
                 .then((response) => {
                     var userResult = response.data;
 

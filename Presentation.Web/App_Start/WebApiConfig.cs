@@ -12,7 +12,6 @@ using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Controllers.OData;
-using Presentation.Web.Controllers.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
@@ -23,11 +22,15 @@ using System.Linq;
 
 namespace Presentation.Web
 {
-    using Controllers.OData.AttachedOptions;
     using DocumentFormat.OpenXml.Wordprocessing;
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
+    using Models.CreateModels.User;
     using System;
+    using System.Collections.Generic;
+    using System.Web.OData;
+    using System.Web.OData.Batch;
+    using System.Web.OData.Routing.Conventions;
     using DataType = Core.DomainModel.ItSystem.DataType;
     using HelpText = Core.DomainModel.HelpText;
 
@@ -48,34 +51,142 @@ namespace Presentation.Web
             // For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.
             //config.EnableQuerySupport();
 
-            Action<IContainerBuilder> configureAction = (builder => builder.AddService(ServiceLifetime.Transient, typeof(ODataUriResolver), sp => new StringAsEnumResolver() { EnableCaseInsensitive = true })
-            .AddService(ServiceLifetime.Transient, typeof(IEdmModel), sp => GetModel()));
+            var routeName = "odata";
+
+            var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: "odata", configureAction: (builder => builder
+            .AddService(ServiceLifetime.Singleton, sp => new StringAsEnumResolver() { EnableCaseInsensitive = true })
+            .AddService(ServiceLifetime.Singleton, sp => GetModel())
+            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver())
+            .AddService(ServiceLifetime.Singleton, sp => new UnqualifiedODataUriResolver())
+            .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp =>
+                        ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
             
-
-
-
-
-            //OData
-            config.MapODataServiceRoute(
-                routeName: "odata",
-                routePrefix: "odata",
-                configureAction: configureAction);
-
-            
-
-
-
-            //  config.EnableEnumPrefixFree(true);
-            //  config.EnableCaseInsensitive(true);
-            //  config.EnableUnqualifiedNameCall(true);
-            config.Formatters.Remove(config.Formatters.XmlFormatter);
+        //OData
+        //  config.EnableEnumPrefixFree(true);
+        //  config.EnableCaseInsensitive(true);
+        //  config.EnableUnqualifiedNameCall(true);
+        config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
         }
 
         public static IEdmModel GetModel()
         {
             var builder = new ODataConventionModelBuilder();
+           
+            //ITPROJECTS
+            var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace("Controller", string.Empty));
+            itProject.HasRequiredBinding(o => o.Organization, "Organizations");
+            itProject.EntityType.HasKey(x => x.Id);
 
+            //INTERFACEUSAGE
+            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages");
+            interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
+            
+            //ITSYSTEMS
+            var itSystems = builder.EntitySet<ItSystem>(nameof(ItSystemsController).Replace("Controller", string.Empty));
+            itSystems.HasRequiredBinding(o => o.Organization, "Organizations");
+            itSystems.HasRequiredBinding(o => o.BelongsTo, "Organizations");
+            itSystems.HasManyBinding(i => i.Children, "ItSystems");
+            itSystems.HasRequiredBinding(i => i.Parent, "ItSystems");
+            itSystems.EntityType.HasKey(x => x.Id);
+
+             //ITSYSTEMTYPES
+            var itSystemType = builder.EntitySet<ItSystemType>("ItSystemTypes");//(nameof(ItSystemTypesController).Replace("Controller", string.Empty));
+            itSystemType.HasManyBinding(i => i.References, "ItSystems");
+            itSystemType.EntityType.HasKey(x => x.Id);
+            
+            //CONTRACTS
+            var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
+            contracts.HasRequiredBinding(o => o.Organization, "Organizations");
+            contracts.HasRequiredBinding(o => o.Supplier, "Organizations");
+            contracts.EntityType.HasKey(x => x.Id);
+            contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
+            contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
+
+             //ORGANIZATIONUNITRIGHTS
+            var orgUnitRightsEntitysetName = nameof(OrganizationUnitRightsController).Replace("Controller", string.Empty);
+            var organizationUnitRights = builder.EntitySet<OrganizationUnitRight>(orgUnitRightsEntitysetName);
+            organizationUnitRights.EntityType.HasKey(x => x.Id);
+
+            // USERS
+            var userEntitySetName = nameof(UsersController).Replace("Controller", string.Empty);
+            var users = builder.EntitySet<User>(userEntitySetName);
+            users.HasRequiredBinding(u => u.DefaultOrganization, "Organizations");
+            users.EntityType.HasKey(x => x.Id);
+            users.EntityType.Ignore(x => x.Password);
+            users.EntityType.Ignore(x => x.Salt);
+            users.EntityType.Property(x => x.Name).IsRequired();
+            users.EntityType.Property(x => x.Email).IsRequired();
+
+           //functions/actions bound to entityset users
+            var usrNameSpaceName = "UserService";
+
+            var usrsIsEmailAvailableFunction = users.EntityType.Collection.Function("IsEmailAvailable").Returns<bool>();
+            usrsIsEmailAvailableFunction.Parameter<string>("email").OptionalParameter = false;
+            usrsIsEmailAvailableFunction.Namespace = usrNameSpaceName;
+
+            var userGetByMailFunction = users.EntityType.Collection.Function("GetUserByEmail").ReturnsFromEntitySet<User>(userEntitySetName);
+            userGetByMailFunction.Parameter<string>("email").OptionalParameter = false;
+            userGetByMailFunction.Namespace = usrNameSpaceName;
+
+            var userGetOrgUnitRightsFunction = users.EntityType.Function("OrganizationUnitRights").ReturnsCollectionFromEntitySet<OrganizationUnitRight>(orgUnitRightsEntitysetName);
+            userGetOrgUnitRightsFunction.Parameter<int>("userId").OptionalParameter = false;
+            userGetOrgUnitRightsFunction.Namespace = usrNameSpaceName;
+
+             // action because it is a post.
+            var createUserAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
+            createUserAction.Parameter<CreateUserPayload>("payload").OptionalParameter = false;
+            createUserAction.Namespace = usrNameSpaceName;
+           /* /*  */
+            /*//REPORTS
+            var reportsEntitySetName = nameof(ReportsController).Replace("Controller", string.Empty);
+            var reports = builder.EntitySet<Report>(reportsEntitySetName);
+            reports.HasRequiredBinding(u => u.Organization, "Organizations");
+            reports.EntityType.HasKey(x => x.Id);
+
+            //ORGANIZATIONUNITS
+            var orgUnitEntitySetName = nameof(OrganizationUnitsController).Replace("Controller", string.Empty);
+            var orgUnits = builder.EntitySet<OrganizationUnit>(orgUnitEntitySetName);
+            orgUnits.HasRequiredBinding(o => o.Organization, "Organizations");
+            orgUnits.EntityType.HasKey(x => x.Id);
+            orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
+            orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
+            //Add isActive to result form odata
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContract)).AddProperty(typeof(ItContract).GetProperty("IsActive"));
+            
+            //ORGANIZATION
+            var organizationEntitySetName = nameof(OrganizationsController).Replace("Controller", string.Empty);
+            var organizations = builder.EntitySet<Organization>(organizationEntitySetName);
+            organizations.EntityType.HasKey(x => x.Id);
+            organizations.EntityType.HasMany(x => x.OrganizationUnits).IsNavigable().Name = "OrganizationUnits";
+            organizations.HasManyBinding(o => o.ItSystems, "ItSystems");
+            organizations.HasManyBinding(o => o.BelongingSystems, "ItSystems");
+
+            //functions/actions bound to entityset organization
+               
+            var orgNameSpaceName = "organizationService";
+
+             /* var orgGetUsersFunction = organizations.EntityType.Function("GetUsers").ReturnsCollectionFromEntitySet<User>(userEntitySetName);
+            orgGetUsersFunction.Namespace = orgNameSpaceName;
+
+            var orgRemoveUserFunction = organizations.EntityType.Function("RemoveUser").Returns<IHttpActionResult>();
+            orgRemoveUserFunction.Parameter<int>("orgKey");
+            orgRemoveUserFunction.Parameter<ODataActionParameters>("parameters");
+            orgRemoveUserFunction.Namespace = orgNameSpaceName;
+          
+            var orgGetOrganizationUnitFunction = organizations.EntityType.Function("GetOrganizationUnit").ReturnsFromEntitySet<OrganizationUnit>(orgUnitEntitySetName);
+            orgGetOrganizationUnitFunction.Parameter<int>("orgKey");
+            orgGetOrganizationUnitFunction.Parameter<int>("unitKey");
+            orgGetOrganizationUnitFunction.Namespace = orgNameSpaceName; */
+
+            // ITPROJECTORGUNITUSAGE
+           /* var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet why the name is not deprived from the controller
+            itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
+
+
+            /* old edm model
+             
+            
             // BUG with EnableLowerCamelCase http://stackoverflow.com/questions/39269261/odata-complains-about-missing-id-property-when-enabling-camelcasing
             //builder.EnableLowerCamelCase();
 
@@ -605,8 +716,33 @@ namespace Presentation.Web
             itProjectStatusUpdates.EntityType.HasKey(x => x.Id);
             itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, "Organizations");
 
+             
+             */
+
+
+
+
+
+
+
+
+
+
 
             return builder.GetEdmModel();
         }
     }
+
+    //For making urls case insensitive
+    internal class CaseInsensitiveResolver : ODataUriResolver
+    {
+        private bool _enableCaseInsensitive;
+
+        public override bool EnableCaseInsensitive
+        {
+            get { return true; }
+            set { _enableCaseInsensitive = value; }
+        }
+    }
+
 }

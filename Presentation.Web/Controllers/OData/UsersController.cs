@@ -1,61 +1,54 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Models;
+using Presentation.Web.Models.CreateModels.User;
+using Swashbuckle.Swagger.Annotations;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class UsersController : BaseEntityController<User>
+    public class UsersController : BaseEntityController<User, UserDTO>
     {
         private readonly IAuthenticationService _authService;
         private readonly IUserService _userService;
         private readonly IGenericRepository<User> _repository;
+        private readonly IGenericRepository<OrganizationUnitRight> _orgUnitRightsrepository;
 
-        public UsersController(IGenericRepository<User> repository, IAuthenticationService authService, IUserService userService)
+        public UsersController(IGenericRepository<User> repository, IAuthenticationService authService, IUserService userService,
+            IGenericRepository<OrganizationUnitRight> orgUnitRightsrepository)
             : base(repository, authService)
         {
             _authService = authService;
             _userService = userService;
             _repository = repository;
+            _orgUnitRightsrepository = orgUnitRightsrepository;
         }
-
-        public override IHttpActionResult Post(User entity)
+        [SwaggerResponse(HttpStatusCode.MethodNotAllowed, "This method is not allowed user the Action Create instead")]
+        public override IHttpActionResult Post(UserDTO entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
-
-        [ODataRoute("Users/Create")]
-        public IHttpActionResult PostCreate(ODataActionParameters parameters)
+        
+        [SwaggerResponse(HttpStatusCode.Created, "Returns the created user", typeof(UserDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, "Returned if an error occurs")]
+        public IHttpActionResult Create(CreateUserPayload payload)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            User user = null;
-            if (parameters.ContainsKey("user"))
-            {
-                user = parameters["user"] as User;
-                Validate(user); // this will set the ModelState if not valid - it doesn't http://stackoverflow.com/questions/39484185/model-validation-in-odatacontroller
-            }
+            User user = AutoMapper.Mapper.Map<User>(payload.User);
 
-            var organizationId = 0;
-            if (parameters.ContainsKey("organizationId"))
-            {
-                organizationId = (int)parameters["organizationId"];
-                // TODO check if user is allowed to add users to this organization
-            }
-
-            var sendMailOnCreation = false;
-            if (parameters.ContainsKey("sendMailOnCreation"))
-            {
-                sendMailOnCreation = (bool)parameters["sendMailOnCreation"];
-            }
-
+            Validate(payload.User); // this will set the ModelState if not valid - it doesn't http://stackoverflow.com/questions/39484185/model-validation-in-odatacontroller
+      
             if (user?.Email != null && EmailExists(user.Email))
             {
                 ModelState.AddModelError(nameof(user.Email), "Email is already in use.");
@@ -77,13 +70,14 @@ namespace Presentation.Web.Controllers.OData
             user.ObjectOwnerId = UserId;
             user.LastChangedByUserId = UserId;
 
-            var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
-
+            var createdUser = _userService.AddUser(user, payload.SendMailOnCreation, payload.OrganizationId);
+            var userToReturn = AutoMapper.Mapper.Map<UserDTO>(createdUser);
             return Created(createdUser);
         }
 
-        [ODataRoute("Users/IsEmailAvailable(email={email})")]
-        public IHttpActionResult GetIsEmailAvailable(string email)
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, "Returns a bool saying if the email is available", typeof(bool))]
+        public IHttpActionResult IsEmailAvailable(string email)
         {
             // strip strange single quotes from parameter
             // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
@@ -96,7 +90,8 @@ namespace Presentation.Web.Controllers.OData
                 return Ok(true);
         }
 
-        [ODataRoute("GetUserByEmail(email={email})")]
+        [SwaggerResponse(HttpStatusCode.OK, "Returns user with matching email", typeof(UserDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound, "returns notFound if no user is found")]
         public IHttpActionResult GetUserByEmail(string email)
         {
             // strip strange single quotes from parameter
@@ -107,34 +102,18 @@ namespace Presentation.Web.Controllers.OData
             var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == strippedEmail.ToLower());
             if(userToReturn != null)
             {
+                var result = AutoMapper.Mapper.Map<UserDTO>(userToReturn);
                 return Ok(userToReturn);
             }
             return NotFound();
         }
-
-        //GET /Organizations(1)/DefaultOrganizationForUsers
+        
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
-        public IHttpActionResult GetDefaultOrganizationForUsers(int orgKey)
+        [SwaggerResponse(HttpStatusCode.OK, "Returns organizationUnit rights for a specific user", typeof(UserDTO))]
+        public IHttpActionResult OrganizationUnitRights([FromODataUri] int userId)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
-            return Ok(result);
-        }
-
-        //GET /Organizations(1)/Users
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Users")]
-        public IHttpActionResult GetByOrganization(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            var result = Repository.AsQueryable().Where(m => m.OrganizationRights.Any(r=> r.OrganizationId == orgKey));
+            // TODO figure out how to check auth
+            var result = _orgUnitRightsrepository.AsQueryable().Where(x => x.UserId == userId);
             return Ok(result);
         }
 

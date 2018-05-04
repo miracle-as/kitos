@@ -10,11 +10,12 @@ using Core.DomainServices;
 using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
-    public class ItProjectsController : BaseEntityController<ItProject>
+    public class ItProjectsController : BaseEntityController<ItProject, ItProjectDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IAuthenticationService _authService;
@@ -27,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("ItProjects")]
+        //[ODataRoute("ItProjects")]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -41,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItProjects
         [EnableQuery]
-        [ODataRoute("Organizations({key})/ItProjects")]
+        //[ODataRoute("Organizations({key})/ItProjects")]
         public IHttpActionResult GetItProjects(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -62,7 +63,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
+        //[ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
         public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
@@ -78,7 +79,7 @@ namespace Presentation.Web.Controllers.OData
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
+        //[ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

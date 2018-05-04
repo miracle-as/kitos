@@ -7,10 +7,11 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Net;
 using Core.ApplicationServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemsController : BaseEntityController<ItSystem>
+    public class ItSystemsController : BaseEntityController<ItSystem, ItSystemDTO>
     {
         private readonly IAuthenticationService _authService;
 
@@ -20,7 +21,7 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
         
-        [ODataRoute("ItSystems")]
+        //[ODataRoute("ItSystems")]
         public override IHttpActionResult Get()
         {
             var test = base.Get();
@@ -34,7 +35,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
-        [ODataRoute("Organizations({key})/ItSystems")]
+        //[ODataRoute("Organizations({key})/ItSystems")]
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -55,7 +56,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/BelongingSystems
         [EnableQuery]
-        [ODataRoute("Organizations({key})/BelongingSystems")]
+        //[ODataRoute("Organizations({key})/BelongingSystems")]
         public IHttpActionResult GetBelongingSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -76,7 +77,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystems(1)
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
+        //[ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);

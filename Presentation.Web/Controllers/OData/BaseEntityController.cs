@@ -10,7 +10,9 @@ using Ninject.Infrastructure.Language;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
+    public abstract class BaseEntityController<T, TDTO> : BaseController <T> 
+        where T : class, IEntity 
+        where TDTO: class
     {
         private readonly IAuthenticationService _authService;
 
@@ -81,14 +83,16 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
             return Ok(result);
         }
-
+        /*
         public IHttpActionResult Put(int key, T entity)
         {
             return StatusCode(HttpStatusCode.NotImplemented);
-        }
+        }*/
 
-        public virtual IHttpActionResult Post(T entity)
+        public virtual IHttpActionResult Post(TDTO entityDTO)
         {
+            var entity = Map(entityDTO);
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -117,11 +121,10 @@ namespace Presentation.Web.Controllers.OData
 
             return Created(entity);
         }
-
-        public virtual IHttpActionResult Patch(int key, Delta<T> delta)
+        
+        public virtual IHttpActionResult Patch(int key, Delta<TDTO> delta)
         {
             var entity = Repository.GetByKey(key);
-
 
             // does the entity exist?
             if (entity == null)
@@ -137,8 +140,9 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                var enetitydto = AutoMapper.Mapper.Map<TDTO>(entity);
                 // patch the entity
-                delta.Patch(entity);
+                delta.Patch(enetitydto);
                 Repository.Save();
             }
             catch (Exception e)
@@ -172,6 +176,12 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        //for easy access
+        protected virtual T Map(TDTO item)
+        {
+            return AutoMapper.Mapper.Map<T>(item);
         }
     }
 }

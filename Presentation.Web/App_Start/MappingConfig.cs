@@ -10,6 +10,8 @@ using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
+using Presentation.Web.Models.CreateModels.User;
+using Core.DomainModel.Reports;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(MappingConfig), "Start")]
 
@@ -43,9 +45,16 @@ namespace Presentation.Web
             Mapper.CreateMap<ContactPerson, ContactPersonDTO>()
                  .ReverseMap();
 
-
             Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
                   .ReverseMap();
+
+            Mapper.CreateMap<OrganizationUnit, OrganizationUnitDTO>()
+                  .ReverseMap();
+            Mapper.CreateMap<OrganizationUnitRight, OrganizationUnitRightDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<Report, ReportDTO>()
+                   .ReverseMap();
 
             Mapper.CreateMap<ItSystemUsageDataWorkerRelation, ItSystemUsageDataWorkerRelationDTO>()
                   .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
@@ -185,6 +194,8 @@ namespace Presentation.Web
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null))
                   .ReverseMap();
+
+            Mapper.CreateMap<User, CreateUserModel>().ReverseMap();
 
             Mapper.CreateMap<User, UserOverviewDTO>()
                 .ForMember(dest => dest.DefaultOrganizationUnitId,
@@ -465,6 +476,9 @@ namespace Presentation.Web
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.UsedByOrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItProjectOrgUnitUsage, ItProjectOrgUnitUsageDTO>()
+                 .ReverseMap();
 
             Mapper.CreateMap<ItProjectPhase, ItProjectPhaseDTO>()
                   .ReverseMap();

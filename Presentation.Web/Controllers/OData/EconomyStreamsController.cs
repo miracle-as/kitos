@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("ExternEconomyStreams(Organization={orgKey})")]
+        //[ODataRoute("ExternEconomyStreams(Organization={orgKey})")]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
             var result =
@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/ExternEconomyStreams
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams")]
+        //[ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams")]
         public IHttpActionResult GetAllExtern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -68,7 +68,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/InternEconomyStreams
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams")]
+        //[ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams")]
         public IHttpActionResult GetAllIntern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/ExternEconomyStreams(1)
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams({key})")]
+        //[ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams({key})")]
         public IHttpActionResult GetSingleExtern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -103,7 +103,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/InternEconomyStreams(1)
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams({key})")]
+        //[ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams({key})")]
         public IHttpActionResult GetSingleIntern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))

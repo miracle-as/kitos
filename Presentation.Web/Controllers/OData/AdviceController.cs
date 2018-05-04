@@ -189,7 +189,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
+      //  [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
         public IHttpActionResult GetByObjectID(int id,ObjectType type)
         {
             if (UserId == 0)
@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Advice")]
+        //[ODataRoute("Organizations({orgKey})/Advice")]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
             if (UserId == 0)

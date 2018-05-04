@@ -22,7 +22,7 @@ namespace Core.DomainModel.Organization
             Supplier = new List<ItContract.ItContract>();
             ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             ItContracts = new List<ItContract.ItContract>();
-            OrgUnits = new List<OrganizationUnit>();
+            OrganizationUnits = new List<OrganizationUnit>();
             Rights = new List<OrganizationRight>();
             DefaultOrganizationForUsers = new List<User>();
             Reports = new List<Report>();
@@ -46,7 +46,7 @@ namespace Core.DomainModel.Organization
         public string ForeignCvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public Guid? Uuid { get; set; }
-        public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
+        public virtual ICollection<OrganizationUnit> OrganizationUnits { get; set; }
 
         public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }
 
@@ -98,7 +98,7 @@ namespace Core.DomainModel.Organization
         /// <returns></returns>
         public OrganizationUnit GetRoot()
         {
-            return OrgUnits.FirstOrDefault(u => u.Parent == null);
+            return OrganizationUnits.FirstOrDefault(u => u.Parent == null);
         }
 
         /// <summary>

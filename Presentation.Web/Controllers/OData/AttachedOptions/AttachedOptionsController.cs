@@ -14,7 +14,7 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
-    public class AttachedOptionsController : BaseEntityController<AttachedOption>
+    public class AttachedOptionsController : BaseEntityController<AttachedOption, AttachedOptionDTO>
     {
         public AttachedOptionsController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService)
                : base(repository, authService)

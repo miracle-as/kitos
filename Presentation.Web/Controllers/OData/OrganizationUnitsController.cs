@@ -6,10 +6,11 @@ using Core.DomainServices;
 using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
+    public class OrganizationUnitsController : BaseEntityController<OrganizationUnit, OrganizationUnitDTO>
     {
         private readonly IAuthenticationService _authService;
 
@@ -18,7 +19,7 @@ namespace Presentation.Web.Controllers.OData
         {
             _authService = authService;
         }
-
+        /*USE INHERITED GETS instead
         [EnableQuery]
         [ODataRoute("OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits()
@@ -33,35 +34,6 @@ namespace Presentation.Web.Controllers.OData
         {
             return base.Get(unitKey);
         }
-
-        //GET /Organizations(1)/OrganizationUnits
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
-        public IHttpActionResult GetOrganizationUnits(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return StatusCode(HttpStatusCode.Forbidden);
-            }
-
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/OrganizationUnits(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})")]
-        public IHttpActionResult GetOrganizationUnit(int orgKey, int unitKey)
-        {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == unitKey);
-            if (entity == null)
-                return NotFound();
-
-            if (_authService.HasReadAccess(UserId, entity))
-                return Ok(entity);
-
-            return StatusCode(HttpStatusCode.Forbidden);
-        }
+        */
     }
 }

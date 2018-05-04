@@ -864,7 +864,7 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
                 LastChangedByUserId = objectOwner?.Id
             };
 
-            org.OrgUnits.Add(new OrganizationUnit
+            org.OrganizationUnits.Add(new OrganizationUnit
             {
                 Name = org.Name,
                 ObjectOwnerId = objectOwner?.Id,

@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/Rights
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Rights")]
+        //[ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult GetRights(int orgKey)
         {
             var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgKey);
@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         // POST /Organizations(1)/Rights
-        [ODataRoute("Organizations({orgKey})/Rights")]
+        //[ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
             if (!ModelState.IsValid)
@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         // DELETE /Organizations(1)/Rights(1)
-        [ODataRoute("Organizations({orgKey})/Rights({key})")]
+        //[ODataRoute("Organizations({orgKey})/Rights({key})")]
         public IHttpActionResult DeleteRights(int orgKey, int key)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);

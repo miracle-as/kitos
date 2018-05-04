@@ -6,6 +6,7 @@ using Swashbuckle.Application;
 using Swashbuckle.OData;
 using WebActivatorEx;
 using SwashbuckleODataSample;
+using System.Linq;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -104,6 +105,7 @@ namespace SwashbuckleODataSample
                 var commentsFile = Path.Combine(baseDirectory, "bin", commentsFileName);
                 c.IncludeXmlComments(commentsFile);
                 */
+
                 // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                 // exposed in your API. However, there may be occasions when more control of the output is needed.
                 // This is supported through the "MapType" and "SchemaFilter" options:
@@ -139,7 +141,7 @@ namespace SwashbuckleODataSample
                 // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
                 // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
                 // 
-                //c.DescribeAllEnumsAsStrings();
+                c.DescribeAllEnumsAsStrings();
 
                 // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
                 //
@@ -166,7 +168,7 @@ namespace SwashbuckleODataSample
                 // with the same path (sans query string) and HTTP method. You can workaround this by providing a
                 // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
                 //
-                //c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
                 // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
                 // alternative implementation for ISwaggerProvider with the CustomProvider option.
@@ -186,6 +188,7 @@ namespace SwashbuckleODataSample
             })
                 .EnableSwaggerUi(c =>
                 {
+                  
                     // Use the "InjectStylesheet" option to enrich the UI with one or more additional CSS stylesheets.
                     // The file must be included in your project as an "Embedded Resource", and then the resource's
                     // "Logical Name" is passed to the method as shown below.

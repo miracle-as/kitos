@@ -6,11 +6,13 @@ using System.Web.OData;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseOptionController<TType, TDomainModelType> : BaseEntityController<TType>
+    public abstract class BaseOptionController<TType, TDomainModelType, TDTO> : BaseEntityController<TType, TDTO>
         where TType : OptionEntity<TDomainModelType>
+        where TDTO : OptionEntityDTO<TDTO>
     {
 
         private IGenericRepository<TType> _repository;
@@ -23,7 +25,7 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
-        public override IHttpActionResult Patch(int key, Delta<TType> delta)
+        public override IHttpActionResult Patch(int key, Delta<TDTO> delta)
         {
             if (delta == null)
             {
@@ -79,7 +81,7 @@ namespace Presentation.Web.Controllers.OData
             return base.Patch(key, delta);
         }
 
-        public override IHttpActionResult Post(TType entity)
+        public override IHttpActionResult Post(TDTO entity)
         {
             try
             {

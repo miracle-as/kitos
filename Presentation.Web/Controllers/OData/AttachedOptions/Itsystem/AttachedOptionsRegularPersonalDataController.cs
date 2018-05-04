@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        [ODataRoute("GetRegularPersonalDataByObjectID(id={id},entitytype={entitytype})")]
+        //[ODataRoute("GetRegularPersonalDataByObjectID(id={id},entitytype={entitytype})")]
         public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
         {
             return base.GetOptionsByObjectIDAndType(id, entitytype, OptionType.REGULARPERSONALDATA);

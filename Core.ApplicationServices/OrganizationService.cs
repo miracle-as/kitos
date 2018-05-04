@@ -49,7 +49,7 @@ namespace Core.ApplicationServices
         public void SetupDefaultOrganization(Organization org, User objectOwner)
         {
             org.Config = Config.Default(objectOwner);
-            org.OrgUnits.Add(new OrganizationUnit()
+            org.OrganizationUnits.Add(new OrganizationUnit()
                 {
                     Name = org.Name,
                     ObjectOwnerId = objectOwner.Id,

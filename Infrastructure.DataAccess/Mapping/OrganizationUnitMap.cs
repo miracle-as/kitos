@@ -21,7 +21,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(o => o.Organization)
-                .WithMany(m => m.OrgUnits)
+                .WithMany(m => m.OrganizationUnits)
                 .HasForeignKey(o => o.OrganizationId)
                 .WillCascadeOnDelete(true);
 

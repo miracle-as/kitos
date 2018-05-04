@@ -87,7 +87,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         [System.Web.Http.HttpDelete]
         [EnableQuery]
-        [ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
+        //[ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
         public IHttpActionResult RemoveOption(int id, int objectId, OptionType type, EntityType entityType)
         {
             var option = _AttachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id 

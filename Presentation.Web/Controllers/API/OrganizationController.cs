@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.API
                         org.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
                         org.AccessModifier == AccessModifier.Local &&
-                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
+                        org.Id == orgId || org.OrganizationUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
 
                 var dtos = Map(orgs2);
                 return Ok(dtos);
@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.API
                         org.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
                         org.AccessModifier == AccessModifier.Local &&
-                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
+                        org.Id == orgId || org.OrganizationUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
 
                 var dtos = Map(orgs2);
                 return Ok(dtos);
