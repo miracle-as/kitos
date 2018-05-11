@@ -11,7 +11,7 @@ using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
+    public class LocalOptionBaseController<TLocalModelType, TLocalModelTypeDTO, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType, TLocalModelTypeDTO> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
     {
         private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<TOptionType> _optionsRepository;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Presentation.Web.Models.CreateModels.User
+namespace Presentation.Web.Models
 {
     public class CreateUserModel
     {

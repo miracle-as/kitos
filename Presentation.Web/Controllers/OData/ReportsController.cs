@@ -4,6 +4,7 @@ using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Presentation.Web.Models;
+using System.Web.OData;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -12,5 +13,12 @@ namespace Presentation.Web.Controllers.OData
         public ReportsController(IGenericRepository<Report> repository, IAuthenticationService authService)
             : base(repository, authService)
         {}
+
+        [EnableQuery]
+        [ODataRoute("Organizations({orgId})/Reports")]
+        public IHttpActionResult GetReports([FromODataUri] int key)
+        {
+            return GetByOrganizationKey(key);
+        }
     }
 }

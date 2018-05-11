@@ -3,7 +3,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
-using Presentation.Web.Models.CreateModels.User;
 using Swashbuckle.Swagger.Annotations;
 using System.Linq;
 using System.Net;
@@ -39,17 +38,33 @@ namespace Presentation.Web.Controllers.OData
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.Created, "Returns the created user", typeof(UserDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest, "Returned if an error occurs")]
-        public IHttpActionResult Create(CreateUserPayload payload)
+        public IHttpActionResult Create(ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            User user = AutoMapper.Mapper.Map<User>(payload.User);
+            User user = null;
+            if (parameters.ContainsKey("user"))
+            {
+                user = parameters["user"] as User;
+                Validate(user); // this will set the ModelState if not valid - it doesn't http://stackoverflow.com/questions/39484185/model-validation-in-odatacontroller
+            }
 
-            Validate(payload.User); // this will set the ModelState if not valid - it doesn't http://stackoverflow.com/questions/39484185/model-validation-in-odatacontroller
-      
+            var organizationId = 0;
+            if (parameters.ContainsKey("organizationId"))
+            {
+                organizationId = (int)parameters["organizationId"];
+                // TODO check if user is allowed to add users to this organization
+            }
+
+            var sendMailOnCreation = false;
+            if (parameters.ContainsKey("sendMailOnCreation"))
+            {
+                sendMailOnCreation = (bool)parameters["sendMailOnCreation"];
+            }
+
             if (user?.Email != null && EmailExists(user.Email))
             {
                 ModelState.AddModelError(nameof(user.Email), "Email is already in use.");
@@ -71,8 +86,8 @@ namespace Presentation.Web.Controllers.OData
             user.ObjectOwnerId = UserId;
             user.LastChangedByUserId = UserId;
 
-            var createdUser = _userService.AddUser(user, payload.SendMailOnCreation, payload.OrganizationId);
-            var userToReturn = AutoMapper.Mapper.Map<UserDTO>(createdUser);
+            var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
+
             return Created(createdUser);
         }
 
@@ -111,7 +126,7 @@ namespace Presentation.Web.Controllers.OData
         
         [EnableQuery]
         [SwaggerResponse(HttpStatusCode.OK, "Returns organizationUnit rights for a specific user", typeof(UserDTO))]
-        public IHttpActionResult OrganizationUnitRights([FromODataUri] int userId)
+        public IHttpActionResult GetOrganizationUnitRights([FromODataUri] int userId)
         {
             // TODO figure out how to check auth
             var result = _orgUnitRightsrepository.AsQueryable().Where(x => x.UserId == userId);

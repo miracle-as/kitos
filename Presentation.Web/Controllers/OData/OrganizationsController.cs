@@ -11,6 +11,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Presentation.Web.Models;
 using System.Linq;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -80,13 +81,20 @@ namespace Presentation.Web.Controllers.OData
             return base.Patch(key, delta);
         }
 
-       /* //Organizations({orgKey})/namespace.RemoveUser
-        public IHttpActionResult RemoveUser([FromODataUri] int orgKey)//, ODataActionParameters parameters)
+        //Organizations({orgKey})/namespace.RemoveUser
+        //Has to be post in order for action to work. 
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, "Returns a Ok if user has been removed")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, "If an error in the request exists")]
+        [SwaggerResponse(HttpStatusCode.NotFound, "If the organization Doesent exists.")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized, "If the user dosent have write access")]
+        public IHttpActionResult RemoveUser([FromODataUri] int key, ODataActionParameters parameters)
         {
+        
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var entity = Repository.GetByKey(orgKey);
+            var entity = Repository.GetByKey(key);
             if (entity == null)
                 return NotFound();
 
@@ -94,26 +102,37 @@ namespace Presentation.Web.Controllers.OData
                 return Unauthorized();
 
             var userId = 0;
-            if (parameters.ContainsKey("userId"))
+           if (parameters.ContainsKey("userId"))
             {
                 userId = (int)parameters["userId"];
                 // TODO check if user is allowed to remove users from this organization
             }
 
-            _organizationService.RemoveUser(orgKey, userId);
+            _organizationService.RemoveUser(key, userId);
+            return Ok(true);
+        }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }*/
-
-       /* [EnableQuery]
-        [ODataRoute("Organizations({orgId})/LastChangedByUser")]
-        public virtual IHttpActionResult GetLastChangedByUser([FromODataUri] int orgKey)
+        //GET /Organizations(1)/namespace.GetUsers
+        [EnableQuery]
+        public IHttpActionResult GetUsers([FromODataUri] int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
                 return StatusCode(HttpStatusCode.Forbidden);
 
-            var result = Repository.GetByKey(orgKey).LastChangedByUser;
+            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
+            return Ok(result);
+        }
+
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/LastChangedByUser")]
+        public virtual IHttpActionResult GetLastChangedByUser([FromODataUri] int Id)
+        {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != Id && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
+            var result = Repository.GetByKey(Id).LastChangedByUser;
             return Ok(result);
         }
 
@@ -130,7 +149,7 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.GetByKey(orgKey).ObjectOwner;
             return Ok(result);
         }
-
+        
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/Type")]
         public virtual IHttpActionResult GetType([FromODataUri] int orgKey)
@@ -145,19 +164,6 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        //GET /Organizations(1)/namespace.GetUsers
-        [EnableQuery]
-        public IHttpActionResult GetUsers([FromODataUri] int key)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId); 
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden); 
-
-            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
-            return Ok(result);
-        }*/
-
-        /*//Organizations({orgKey})/namespace.GetDefaultOrganizationForUsers
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/DefaultOrganizationForUsers")]
         public IHttpActionResult GetDefaultOrganizationForUsers([FromODataUri] int orgKey)
@@ -170,16 +176,6 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        //REPORTS FRA REPORTSCONTROLLER
-        // GET /Organizations(1)/namespace.Reports
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/Reports")]
-        public IHttpActionResult GetReports([FromODataUri] int key)
-        {
-            return GetByOrganizationKey(key);
-        }
-
-        //GET /Organizations(1)/namespace.GetOrganizationUnits
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits([FromODataUri] int orgKey)
@@ -194,8 +190,8 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        // GET /Organizations(1)/namespace.OrganizationUnit(1)
         [EnableQuery]
+        [ODataRoute("Organizations({orgId})/OrganizationUnits({unitKey})")]
         public IHttpActionResult GetOrganizationUnit([FromODataUri] int orgKey, int unitKey)
         {
             var entity = _orgUnitRepository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == unitKey);
@@ -208,7 +204,23 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.Forbidden);
         }
 
+        /* /*
+
+         */
+
+        /*//Organizations({orgKey})/namespace.GetDefaultOrganizationForUsers
+        
+
+        //REPORTS FRA REPORTSCONTROLLER
+        // GET /Organizations(1)/namespace.Reports
+        
+
+        // GET /Organizations(1)/namespace.OrganizationUnit(1)
+        
+
         //FROM ORGUNITRIGHTS repository skal ændres
+        */
+
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/OrganizationUnits({orgUnitId})/Rights")]
         public IHttpActionResult GetByOrganizationUnit([FromODataUri] int orgId, int orgUnitId)
@@ -216,9 +228,8 @@ namespace Presentation.Web.Controllers.OData
             // TODO figure out how to check auth
             var result = _orgUnitRightrepository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == orgUnitId);
             return Ok(result);
-        }*/
-
-
+        }
+        
         //PRIVATE FUNCTIONS herfra
         private void CheckOrgTypeRights(Organization organization)
         {

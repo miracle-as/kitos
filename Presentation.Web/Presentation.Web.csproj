@@ -438,6 +438,7 @@
     <Compile Include="Controllers\OData\ItProjectsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
+    <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
@@ -457,7 +458,7 @@
     <Compile Include="Models\ArchivePeriodDTO.cs" />
     <Compile Include="Models\ContactPersonDTO.cs" />
     <Compile Include="Models\CreateModels\User\CreateUserModel.cs" />
-    <Compile Include="Models\CreateModels\User\CreateUserPayload.cs" />
+    <Compile Include="Models\CreateModels\User\CreateUserDescriptorModel.cs" />
     <Compile Include="Models\DataResponsibleDTO.cs" />
     <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />

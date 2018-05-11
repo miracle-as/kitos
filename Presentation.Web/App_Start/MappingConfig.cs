@@ -10,7 +10,6 @@ using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
-using Presentation.Web.Models.CreateModels.User;
 using Core.DomainModel.Reports;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(MappingConfig), "Start")]

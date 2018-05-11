@@ -19,21 +19,5 @@ namespace Presentation.Web.Controllers.OData
         {
             _authService = authService;
         }
-        /*USE INHERITED GETS instead
-        [EnableQuery]
-        [ODataRoute("OrganizationUnits")]
-        public IHttpActionResult GetOrganizationUnits()
-        {
-            return base.Get();
-        }
-
-        //GET /OrganizationUnits(1)
-        [EnableQuery]
-        [ODataRoute("OrganizationUnits({unitKey})")]
-        public IHttpActionResult GetOrganizationUnit(int unitKey)
-        {
-            return base.Get(unitKey);
-        }
-        */
     }
 }
