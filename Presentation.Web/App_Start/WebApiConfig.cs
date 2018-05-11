@@ -134,12 +134,13 @@ namespace Presentation.Web
             userGetOrgUnitRightsFunction.Namespace = usrNameSpaceName;
 
              // action because it is a post.
-            var createUserAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
+            var createUserAction = users.EntityType.Collection.Function("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             createUserAction.Parameter<CreateUserPayload>("payload").OptionalParameter = false;
             createUserAction.Namespace = usrNameSpaceName;
-           /* /*  */
-            /*//REPORTS
-            var reportsEntitySetName = nameof(ReportsController).Replace("Controller", string.Empty);
+
+        /* /*     */
+            //REPORTS
+     /*       var reportsEntitySetName = nameof(ReportsController).Replace("Controller", string.Empty);
             var reports = builder.EntitySet<Report>(reportsEntitySetName);
             reports.HasRequiredBinding(u => u.Organization, "Organizations");
             reports.EntityType.HasKey(x => x.Id);
@@ -180,7 +181,7 @@ namespace Presentation.Web
             orgGetOrganizationUnitFunction.Namespace = orgNameSpaceName; */
 
             // ITPROJECTORGUNITUSAGE
-           /* var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet why the name is not deprived from the controller
+            var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet why the name is not deprived from the controller
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
 

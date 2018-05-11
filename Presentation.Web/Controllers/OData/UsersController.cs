@@ -36,6 +36,7 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
         
+        [HttpPost]
         [SwaggerResponse(HttpStatusCode.Created, "Returns the created user", typeof(UserDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest, "Returned if an error occurs")]
         public IHttpActionResult Create(CreateUserPayload payload)
