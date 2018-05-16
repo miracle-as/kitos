@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        //[ODataRoute("ItContracts")]
+        [ODataRoute("ItContracts")]
         public override IHttpActionResult Get()
         {
             var orgId = _authService.GetCurrentOrganizationId(UserId);
@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
         [EnableQuery]
-        //[ODataRoute("ItContracts({contractKey})/ResponsibleOrganizationUnit")]
+        [ODataRoute("ItContracts({contractKey})/ResponsibleOrganizationUnit")]
         public IHttpActionResult GetResponsibleOrganizationUnit(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
         [EnableQuery]
-        //[ODataRoute("ItContracts({contractKey})/Organization")]
+        [ODataRoute("ItContracts({contractKey})/Organization")]
         public IHttpActionResult GetOrganization(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).Organization;
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts
         [EnableQuery(MaxExpansionDepth = 3)]
-        //[ODataRoute("Organizations({key})/ItContracts")]
+        [ODataRoute("Organizations({key})/ItContracts")]
         public IHttpActionResult GetItContracts(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/Supplier
         [EnableQuery(MaxExpansionDepth = 3)]
-        //[ODataRoute("Organizations({key})/Supplier")]
+        [ODataRoute("Organizations({key})/Supplier")]
         public IHttpActionResult GetSupplier(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)
         [EnableQuery]
-        //[ODataRoute("Organizations({orgKey})/ItContracts({contractKey})")]
+        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})")]
         public IHttpActionResult GetItContracts(int orgKey, int contractKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == contractKey);
@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.OData
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
         [EnableQuery(MaxExpansionDepth = 3)]
-        //[ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
+        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

@@ -26,23 +26,10 @@ namespace Presentation.Web.Controllers.OData
             _orgUnitRepository = orgUnitRepository;
             _authService = authService;
         }
-
-        [EnableQuery]
-        //[ODataRoute("ItProjects")]
-        public override IHttpActionResult Get()
-        {
-            return base.Get();
-
-            //if (AuthenticationService.HasReadAccessOutsideContext(UserId))
-            //    return base.Get();
-
-            //var orgId = CurrentOrganizationId;
-            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
-        }
-
+        
         // GET /Organizations(1)/ItProjects
         [EnableQuery]
-        //[ODataRoute("Organizations({key})/ItProjects")]
+        [ODataRoute("Organizations({key})/ItProjects")]
         public IHttpActionResult GetItProjects(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -63,7 +50,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
-        //[ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
+        [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
         public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
@@ -79,7 +66,7 @@ namespace Presentation.Web.Controllers.OData
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
-        //[ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
+        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

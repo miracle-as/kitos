@@ -11,10 +11,11 @@ using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
+    public class ItSystemUsagesController : BaseEntityController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
@@ -30,7 +31,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        //[ODataRoute("Organizations({key})/ItSystemUsages")]
+        [ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -43,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
         [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        //[ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
+        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -78,7 +79,7 @@ namespace Presentation.Web.Controllers.OData
 
             return Ok(systemUsages);
         }
-
+/*
         [AcceptVerbs("POST", "PUT")]
         public IHttpActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
         {
@@ -135,7 +136,7 @@ namespace Presentation.Web.Controllers.OData
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);
-        }
+        }*/
 
     }
 }

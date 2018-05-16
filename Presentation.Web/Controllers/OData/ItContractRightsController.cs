@@ -8,10 +8,11 @@ using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
+    using Models;
     using System;
     using System.Net;
 
-    public class ItContractRightsController : BaseEntityController<ItContractRight>
+    public class ItContractRightsController : BaseEntityController<ItContractRight, RightOutputDTO>
     {
         private IAuthenticationService _authService;
         public ItContractRightsController(IGenericRepository<ItContractRight> repository, IAuthenticationService authService)
@@ -22,7 +23,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItContracts(1)/Rights
         [EnableQuery]
-        //[ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
+        [ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
         public IHttpActionResult GetByItContract(int orgId, int contractId)
         {
             // TODO figure out how to check auth
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Users(1)/ItContractRights
         [EnableQuery]
-        //[ODataRoute("Users({userId})/ItContractRights")]
+        [ODataRoute("Users({userId})/ItContractRights")]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -63,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        public override IHttpActionResult Patch(int key, Delta<ItContractRight> delta)
+        public override IHttpActionResult Patch(int key, Delta<RightOutputDTO> delta)
         {
             var entity = Repository.GetByKey(key);
 
@@ -89,8 +90,9 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                var enetitydto = AutoMapper.Mapper.Map<RightOutputDTO>(entity);
                 // patch the entity
-                delta.Patch(entity);
+                delta.Patch(enetitydto);
                 Repository.Save();
             }
             catch (Exception e)

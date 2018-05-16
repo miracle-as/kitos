@@ -175,8 +175,31 @@ namespace Presentation.Web
             organizationRights.HasRequiredBinding(o => o.Organization, "Organizations");
             organizationRights.EntityType.HasKey(x => x.Id);
 
+            //ITSYSMTEMUSAGES
+            var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
+            usages.HasRequiredBinding(u => u.Organization, "Organizations");
+            usages.HasRequiredBinding(u => u.ItSystem, "ItSystems");
+            usages.EntityType.HasKey(x => x.Id);
 
+            //ITSYSTEMRIGHTS
+            var itSystemRights = builder.EntitySet<ItSystemRight>(nameof(ItSystemRightsController).Replace("Controller", string.Empty));
+            itSystemRights.HasRequiredBinding(u => u.Role, "ItSystemRoles");
+            itSystemRights.EntityType.HasKey(x => x.Id);
 
+            //ITINTERFACES
+            var itInterfaces = builder.EntitySet<ItInterface>(nameof(ItInterfacesController).Replace("Controller", string.Empty));
+            itInterfaces.HasRequiredBinding(o => o.Organization, "Organizations");
+            itInterfaces.HasRequiredBinding(o => o.BelongsTo, "Organizations");
+            itInterfaces.EntityType.HasKey(x => x.Id);
+
+            //ITINTERFACEEXHIBITS
+            var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>(nameof(ItInterfaceExhibitsController).Replace("Controller", string.Empty));
+            itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, "ItSystems");
+            itInterfaceExihibits.EntityType.HasKey(x => x.Id);
+
+            //ITCONTRACTS
+            var itContractRights = builder.EntitySet<ItContractRight>(nameof(ItContractRightsController).Replace("Controller", string.Empty));
+            itContractRights.EntityType.HasKey(x => x.Id);
 
 
             /*   var orgGetOrganizationUnitFunction = organizations.EntityType.Function("GetOrganizationUnit").ReturnsFromEntitySet<OrganizationUnit>(orgUnitEntitySetName);
@@ -260,8 +283,7 @@ namespace Presentation.Web
                 //builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibtUsages");
                 //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
 
-                var itContractRights = builder.EntitySet<ItContractRight>(nameof(ItContractRightsController).Replace("Controller", string.Empty));
-                itContractRights.EntityType.HasKey(x => x.Id);
+                
 
                 var itContractRoles = builder.EntitySet<ItContractRole>(nameof(ItContractRolesController).Replace("Controller", string.Empty));
                 itContractRoles.EntityType.HasKey(x => x.Id);
@@ -280,10 +302,7 @@ namespace Presentation.Web
                 var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
                 itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
-                var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace("Controller", string.Empty));
-                itProject.HasRequiredBinding(o => o.Organization, "Organizations");
-                itProject.EntityType.HasKey(x => x.Id);
-
+                
                 var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
                 interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
@@ -395,15 +414,9 @@ namespace Presentation.Web
             var userGetByMailFunction = builder.Function("GetUserByEmail").ReturnsFromEntitySet<User>(userEntitySetName);
             userGetByMailFunction.Parameter<string>("email").OptionalParameter = false;
 
-            var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
-            usages.HasRequiredBinding(u => u.Organization, "Organizations");
-            usages.HasRequiredBinding(u => u.ItSystem, "ItSystems");
-            usages.EntityType.HasKey(x => x.Id);
+            
 
-            var itSystemRights = builder.EntitySet<ItSystemRight>(nameof(ItSystemRightsController).Replace("Controller", string.Empty));
-            itSystemRights.HasRequiredBinding(u => u.Role, "ItSystemRoles");
-            itSystemRights.EntityType.HasKey(x => x.Id);
-
+            
             var roles = builder.EntitySet<ItSystemRole>(nameof(ItSystemRolesController).Replace("Controller", string.Empty));
             roles.EntityType.HasKey(x => x.Id);
 
@@ -427,17 +440,11 @@ namespace Presentation.Web
             var interfaceTypes = builder.EntitySet<InterfaceType>(nameof(InterfaceTypesController).Replace("Controller", string.Empty));
             interfaceTypes.EntityType.HasKey(x => x.Id);
 
-            var itInterfaces = builder.EntitySet<ItInterface>(nameof(ItInterfacesController).Replace("Controller", string.Empty));
-            itInterfaces.HasRequiredBinding(o => o.Organization, "Organizations");
-            itInterfaces.HasRequiredBinding(o => o.BelongsTo, "Organizations");
-            itInterfaces.EntityType.HasKey(x => x.Id);
 
             var itInterfaceTypes = builder.EntitySet<ItInterfaceType>(nameof(ItInterfaceTypesController).Replace("Controller", string.Empty));
             itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
-            var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
-            itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, "ItSystems");
-            itInterfaceExihibits.EntityType.HasKey(x => x.Id);
+            
 
             var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages"); // no controller yet
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)

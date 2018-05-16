@@ -8,10 +8,11 @@ using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
+    using Models;
     using System;
     using System.Net;
 
-    public class ItProjectRightsController : BaseEntityController<ItProjectRight>
+    public class ItProjectRightsController : BaseEntityController<ItProjectRight, RightOutputDTO>
     {
         private IAuthenticationService _authService;
         public ItProjectRightsController(IGenericRepository<ItProjectRight> repository, IAuthenticationService authService)
@@ -22,7 +23,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItProjects(1)/Rights
         [EnableQuery]
-        //[ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
+        [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
         public IHttpActionResult GetByItProject(int orgId, int projId)
         {
             // TODO figure out how to check auth
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
-        //[ODataRoute("Users({userId})/ItProjectRights")]
+        [ODataRoute("Users({userId})/ItProjectRights")]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -63,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        public override IHttpActionResult Patch(int key, Delta<ItProjectRight> delta)
+        public override IHttpActionResult Patch(int key, Delta<RightOutputDTO> delta)
         {
             var entity = Repository.GetByKey(key);
 
@@ -88,14 +89,16 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                var enetitydto = AutoMapper.Mapper.Map<RightOutputDTO>(entity);
                 // patch the entity
-                delta.Patch(entity);
+                delta.Patch(enetitydto);
                 Repository.Save();
             }
             catch (Exception e)
             {
                 return InternalServerError(e);
             }
+
 
             // add the request header "Prefer: return=representation"
             // if you want the updated entity returned,

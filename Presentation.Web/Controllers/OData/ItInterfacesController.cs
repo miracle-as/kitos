@@ -7,10 +7,11 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItInterfacesController : BaseEntityController<ItInterface>
+    public class ItInterfacesController : BaseEntityController<ItInterface, ItInterfaceDTO>
     {
         private readonly IAuthenticationService _authService;
 
@@ -20,16 +21,9 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
-        [EnableQuery]
-        //[ODataRoute("ItInterfaces")]
-        public override IHttpActionResult Get()
-        {
-            return base.Get();
-        }
-
         // GET /Organizations(1)/ItInterfaces
         [EnableQuery]
-        //[ODataRoute("Organizations({key})/ItInterfaces")]
+        [ODataRoute("Organizations({key})/ItInterfaces")]
         public IHttpActionResult GetItInterfaces(int key)
         {
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
@@ -38,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItInterfaces(1)
         [EnableQuery]
-        //[ODataRoute("Organizations({orgKey})/ItInterfaces({interfaceKey})")]
+        [ODataRoute("Organizations({orgKey})/ItInterfaces({interfaceKey})")]
         public IHttpActionResult GetItInterfaces(int orgKey, int interfaceKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == interfaceKey);

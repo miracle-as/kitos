@@ -8,10 +8,11 @@ using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
+    using Models;
     using System;
     using System.Net;
 
-    public class ItSystemRightsController : BaseEntityController<ItSystemRight>
+    public class ItSystemRightsController : BaseEntityController<ItSystemRight, RightOutputDTO>
     {
         private IAuthenticationService _authService;
         public ItSystemRightsController(IGenericRepository<ItSystemRight> repository, IAuthenticationService authService)
@@ -22,7 +23,8 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery]
-        //[ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
+        [HttpGet]
+        [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
             // TODO figure out how to check auth
@@ -32,7 +34,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
-        //[ODataRoute("Users({userId})/ItSystemRights")]
+        [ODataRoute("Users({userId})/ItSystemRights")]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -40,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        public override IHttpActionResult Patch(int key, Delta<ItSystemRight> delta)
+        public override IHttpActionResult Patch(int key, Delta<RightOutputDTO> delta)
         {
             var entity = Repository.GetByKey(key);
 
@@ -65,8 +67,9 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                var enetitydto = AutoMapper.Mapper.Map<RightOutputDTO>(entity);
                 // patch the entity
-                delta.Patch(entity);
+                delta.Patch(enetitydto);
                 Repository.Save();
             }
             catch (Exception e)
