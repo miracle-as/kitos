@@ -10,8 +10,9 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     using Core.DomainModel.LocalOptions;
+    using Models;
 
-    public class LocalItSystemCategoriesController : LocalOptionBaseController<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>
+    public class LocalItSystemCategoriesController : LocalOptionBaseController<LocalItSystemCategories, ItSystemUsage, ItSystemCategories, LocalItSystemCategoriesDTO, ItSystemUsageDTO, ItSystemCategoriesDTO>
     {
         public LocalItSystemCategoriesController(IGenericRepository<LocalItSystemCategories> repository, IAuthenticationService authService, IGenericRepository<ItSystemCategories> optionsRepository)
             : base(repository, authService, optionsRepository)

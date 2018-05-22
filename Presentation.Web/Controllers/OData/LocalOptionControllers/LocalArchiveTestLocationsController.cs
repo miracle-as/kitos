@@ -10,8 +10,9 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     using Core.DomainModel.ItSystemUsage;
     using Core.DomainModel.LocalOptions;
     using Core.DomainServices;
+    using Models;
 
-    public class LocalArchiveTestLocationsController : LocalOptionBaseController<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>
+    public class LocalArchiveTestLocationsController : LocalOptionBaseController<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation, LocalArchiveTestLocationDTO, ItSystemUsageDTO, ArchiveTestLocationDTO>
     {
         public LocalArchiveTestLocationsController(IGenericRepository<LocalArchiveTestLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveTestLocation> optionsRepository)
             : base(repository, authService, optionsRepository)

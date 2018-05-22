@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,11 @@ using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class LocalOptionBaseController<TLocalModelType, TLocalModelTypeDTO, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType, TLocalModelTypeDTO> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
+    public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType, TLocalModelTypeDTO, TDomainModelTypeDTO> : BaseEntityController<TLocalModelType, TLocalModelTypeDTO>
+        where TLocalModelType : LocalOptionEntity<TOptionType>, new() 
+        where TOptionType : OptionEntity<TDomainModelType>
+        where TLocalModelTypeDTO: LocalOptionEntityDTO, new()
+
     {
         private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<TOptionType> _optionsRepository;
@@ -90,10 +95,13 @@ namespace Presentation.Web.Controllers.OData
             return Ok(option);
         }
 
-        public override IHttpActionResult Post(TLocalModelType entity)
+        public override IHttpActionResult Post(TLocalModelTypeDTO entityDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var entity = AutoMapper.Mapper.Map<TLocalModelType>(entityDTO);
+
 
             entity.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
 
@@ -142,7 +150,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
+        public override IHttpActionResult Patch(int key, Delta<TLocalModelTypeDTO> delta)
         {
             var orgId = _authService.GetCurrentOrganizationId(UserId);
             var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
@@ -157,15 +165,16 @@ namespace Presentation.Web.Controllers.OData
                 // check if user is allowed to write to the entity
                 if (!_authService.HasWriteAccess(UserId, localOption))
                     return StatusCode(HttpStatusCode.Forbidden);
-
+                
                 // check model state
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
                 try
                 {
+                    var enetitydto = AutoMapper.Mapper.Map<TLocalModelTypeDTO>(localOption);
                     // patch the entity
-                    delta.Patch(localOption);
+                    delta.Patch(enetitydto);
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -176,16 +185,19 @@ namespace Presentation.Web.Controllers.OData
             else {
                 try
                 {
-                    TLocalModelType entity = new TLocalModelType();
-                    entity.ObjectOwnerId = UserId;
-                    entity.LastChangedByUserId = UserId;
-                    entity.OptionId = key;
-                    var entityWithOrganization = entity as IHasOrganization;
+                    TLocalModelTypeDTO entityDTO = new TLocalModelTypeDTO();
+                    entityDTO.ObjectOwnerId = UserId;
+                    entityDTO.LastChangedByUserId = UserId;
+                    entityDTO.OptionId = key;
+                    var entityWithOrganization = entityDTO as IHasOrganization;
                     if (entityWithOrganization != null)
                     {
                         entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
                     }
-                    delta.Patch(entity);
+                    delta.Patch(entityDTO);
+
+                    var entity = AutoMapper.Mapper.Map<TLocalModelType>(entityDTO);
+
                     entity = Repository.Insert(entity);
                     Repository.Save();
                 }

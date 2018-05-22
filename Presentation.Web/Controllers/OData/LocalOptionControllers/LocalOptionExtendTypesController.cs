@@ -2,10 +2,11 @@
 using Core.DomainModel.ItContract;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
-    public class LocalOptionExtendTypesController : LocalOptionBaseController<LocalOptionExtendType, ItContract, OptionExtendType>
+    public class LocalOptionExtendTypesController : LocalOptionBaseController<LocalOptionExtendType, ItContract, OptionExtendType, LocalOptionExtendTypeDTO, ItContractDTO, OptionDTO>
     {
         public LocalOptionExtendTypesController(IGenericRepository<LocalOptionExtendType> repository, IAuthenticationService authService, IGenericRepository<OptionExtendType> optionsRepository)
             : base(repository, authService, optionsRepository)

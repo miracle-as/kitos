@@ -25,7 +25,6 @@ namespace Presentation.Web.Controllers.OData
 
         [HttpGet]
         [EnableQuery]
-        [ODataRoute("ReportsItSystemRoles")]
         public IHttpActionResult Get()
         {
             if (!_authService.HasReadAccessOutsideContext(UserId))

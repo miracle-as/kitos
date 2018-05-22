@@ -14,9 +14,10 @@ using System.Web.OData.Routing;
 namespace Presentation.Web.Controllers.OData
 {
     using Core.DomainModel.AdviceSent;
+    using Models;
     using System.Net;
 
-    public class AdviceController : BaseEntityController<Advice>
+    public class AdviceController : BaseEntityController<Advice, AdviceDTO>
     {
 
         IAuthenticationService _authService;
@@ -34,22 +35,21 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(Advice advice)
+        public override IHttpActionResult Post(AdviceDTO advice)
         {
-
             var response = base.Post(advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>)) {
                 
-                var createdRepsonse = (CreatedODataResult<Advice>)response ;
+                var createdRepsonse = (CreatedODataResult<Advice>)response;
                 var name = "Advice: " + createdRepsonse.Entity.Id;
 
-                advice = createdRepsonse.Entity;
+                var createdAdvice = createdRepsonse.Entity;
                 advice.JobId = name;
 
                 try
                 {
-                    _repository.Update(advice);
+                    _repository.Update(createdAdvice);
                     _repository.Save();
                 }
                 catch (Exception e) {
@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Patch(int key, Delta<Advice> delta)
+        public override IHttpActionResult Patch(int key, Delta<AdviceDTO> delta)
         {
             var response = base.Patch(key, delta);
             
@@ -205,8 +205,8 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Advice")]
-        public IHttpActionResult GetByOrganization(int orgKey)
+        [ODataRoute("Advice")]
+        public IHttpActionResult GetAdviceByOrganization([FromODataUri]int orgKey)
         {
             if (UserId == 0)
                 return Unauthorized();

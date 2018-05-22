@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseOptionController<TType, TDomainModelType, TDTO> : BaseEntityController<TType, TDTO>
+    public abstract class BaseOptionController<TType, TDomainModelType, TDTO, TDomainModelTypeDTO> : BaseEntityController<TType, TDTO>
         where TType : OptionEntity<TDomainModelType>
         where TDTO : OptionEntityDTO<TDTO>
     {

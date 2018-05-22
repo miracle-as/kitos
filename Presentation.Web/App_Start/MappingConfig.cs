@@ -11,6 +11,7 @@ using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Reports;
+using Core.DomainModel.LocalOptions;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(MappingConfig), "Start")]
 
@@ -42,6 +43,9 @@ namespace Presentation.Web
                   .ReverseMap();
 
             Mapper.CreateMap<ContactPerson, ContactPersonDTO>()
+                 .ReverseMap();
+
+            Mapper.CreateMap<AccessType, AccessTypeDTO>()
                  .ReverseMap();
 
             Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
@@ -174,7 +178,42 @@ namespace Presentation.Web
                   .ReverseMap();
 
             Mapper.CreateMap<DataResponsible, DataResponsibleDTO>()
-                  .ReverseMap(); 
+                  .ReverseMap();
+            
+            //Local option types:
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalArchiveLocation, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                  .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                  .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+            Mapper.CreateMap<LocalAgreementElementType, LocalOptionEntityDTO>()
+                 .ReverseMap();
+
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.Advice;
+using System;
 
 namespace Presentation.Web.Models
 {
@@ -14,5 +15,6 @@ namespace Presentation.Web.Models
         public int ItContractId { get; set; }
         public DateTime? SentDate { get; set; }
         public string JobId { get; set; }
+        public Scheduling? Scheduling { get; set; }
     }
 }

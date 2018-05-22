@@ -25,9 +25,17 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        //[ODataRoute("GetSensitivePersonalDataByObjectID(id={id}, entitytype={entitytype})")]
-        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
+        [ODataRoute("GetSensitivePersonalDataByObjectID(id={id}, entitytype={entitytype})")]
+        public IHttpActionResult GetOptionsByObjectID(int id, ODataActionParameters parameters)
         {
+            EntityType entitytype = 0;
+
+            if (parameters.ContainsKey("entitytype"))
+            {
+                entitytype = (EntityType)parameters["entitytype"];
+                // TODO check if user is allowed to remove users from this organization
+            }
+
             return base.GetOptionsByObjectIDAndType(id,entitytype, OptionType.SENSITIVEPERSONALDATA);
         }
     }
