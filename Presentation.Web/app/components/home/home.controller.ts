@@ -10,14 +10,21 @@
                     texts: [
                         "$http", $http => $http.get("api/text/")
                             .then(result => result.data.response)
-                    ]
+                    ],
+                    user: [
+                        "userService", userService => userService.getUser()
+                    ],
+                    organization: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                        return $http.get('api/Organization/' + user.currentOrganizationId)
+                            .then(result => result.data.response);
+                    }]
                 }
             });
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth","$location",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "user", "organization", "navigationService", "$sce", "$auth","$location",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, user, organization, navigationService, $sce, $auth, $location) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -40,7 +47,8 @@
                 theme: 'modern',
                 convert_urls: false
             };
-
+            // Type id contains type of organization, contains an ENUM of organization types.
+            $rootScope.typeId = organization.typeId;
             $scope.text = {};
 
             var token = $location.search()["id_token"];
